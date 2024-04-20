@@ -1,8 +1,6 @@
 package io.valentinsoare.wordtally.setupasync;
 
 import io.valentinsoare.wordtally.outputformat.OutputFormat;
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.core.task.TaskExecutor;
 
 import java.util.concurrent.*;
