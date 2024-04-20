@@ -12,8 +12,6 @@ import java.util.concurrent.*;
  * Here we defined the ThreadPoolExecutor with values that are given when creating the object from AsynchronousConfiguration class.
  */
 
-@Getter
-@Setter
 public class DynamicThreadPoolManager implements TaskExecutor {
     private int corePoolSize;
     private int maxPoolSize;
