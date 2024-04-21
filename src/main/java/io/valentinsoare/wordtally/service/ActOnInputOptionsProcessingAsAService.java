@@ -250,10 +250,9 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
         if (options.isEmpty()) {
             cfnL = parsingAsAService.countTheNumberOfLines(inputFile);
             cfnW = parsingAsAService.countTheNumberOfWords(inputFile);
-            cfnC = parsingAsAService.countTheNumberOfChars(inputFile);
             cfnB = parsingAsAService.countTheNumberOfBytes(inputFile);
 
-            allCFs.addAll(Arrays.asList(cfnL, cfnW, cfnC, cfnB));
+            allCFs.addAll(Arrays.asList(cfnL, cfnW, cfnB));
         } else {
             for (String s : options) {
                 switch (s) {
@@ -279,7 +278,7 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
         }
 
         return CompletableFuture.allOf(allCFs.toArray(e -> new CompletableFuture[]{}))
-                .thenApplyAsync(v -> allCFs.stream()
+                .thenApply(v -> allCFs.stream()
                         .map(CompletableFuture::join)
                         .toList()).join();
     }
