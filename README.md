@@ -1,5 +1,4 @@
-# :abc:  WordTally
-## _Build Your Own wc Tool Coding Challenge_
+## :abc: WordTally - Build Your Own wc Tool Coding Challenge
 > https://codingchallenges.fyi/challenges/challenge-wc/
 
 <br>
