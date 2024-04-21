@@ -15,3 +15,23 @@ will be read from the stdin file descriptor of the process id of wordtally
 <br>
 
 [![final-Small.png](https://i.postimg.cc/DfLpz7ky/final-Small.png)](https://moviesondemand.io)
+
+## Concepts/technologies used:
+1. [X] Object-Oriented Programming Principles;
+2. [X] Collections Framework — Array, ArraysList and HashMap;
+3. [X] Lambda functions, Streams and Method references;
+4. [X] Design patterns from the GoF: Singleton and Builder along with Dependency Injection and Inversion of Control;
+5. [X] Spring Boot with CommandLineRunner interface and Lombok, Jackson and Apache Commons CLI dependencies;
+6. [X] Logging and banner were disabled (spring.main.banner-mode=OFF, logging.level.root=WARN) on Spring Boot along with Tomcat Server (spring.main.web-application-type=NONE);
+7. [X] JSON and Serialization;
+8. [X] Asynchronous with Concurrency processing implemented with CompletableStage/CompletableFuture API to handle multiple files as input much easier and faster;  
+9. [X] IO and NIO libraries for input/output processing;
+
+<br>
+
+> [!NOTE]
+> Challenge is :100: completed!
+
+<br>
+
+![](WordTallyClassicOptions.gif)
