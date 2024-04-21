@@ -38,5 +38,6 @@ will be read from the stdin file descriptor of the process id of wordtally
 <br>
 :white_check_mark: How to use it with short options and files as input.
 
+
 [![word-Tally-Short-Options.png](https://i.postimg.cc/qgHJKV1h/word-Tally-Short-Options.png)](https://moviesondemand.io)
 
