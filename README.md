@@ -37,7 +37,7 @@ will be read from the stdin file descriptor of the process id of wordtally
 
 ## :man_technologist: How To:
 
-:white_check_mark: Where to find the .jar and binary file made with GraalVM.
+:white_check_mark: In the target directory in this repo you can find everything you need to run the app, the .jar and binary file made with GraalVM.
 
 [![Screenshot-from-2024-04-21-07-46-08.png](https://i.postimg.cc/PqRf6LtY/Screenshot-from-2024-04-21-07-46-08.png)](https://moviesondemand.io)
 
