@@ -180,8 +180,7 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
 
                 Map<String, List<Long>> rs = CompletableFuture.allOf(results.values().toArray(e -> new CompletableFuture[]{}))
                         .thenApplyAsync(w -> results.entrySet().stream()
-                                .collect(Collectors.toMap(Map.Entry::getKey, v -> v.getValue().join()))
-                                ).join();
+                                .collect(Collectors.toMap(Map.Entry::getKey, v -> v.getValue().join()))).join();
 
                 for (Map.Entry<String, List<Long>> e : rs.entrySet()) {
                     constructOutputToPrint(e.getValue(), e.getKey(), true);

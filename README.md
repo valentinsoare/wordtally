@@ -58,3 +58,60 @@ will be read from the stdin file descriptor of the process id of wordtally
 :white_check_mark: What happens when proper input is not provided (wrong options, files, etc).
 
 ![](contentforreadmepage/WordTallyWithErrorsHelpAndRedirectToAnotherCommand.gif)
+
+:point_right: If you want to see the code and make additions, you can clone this repo and try it. In case you want a binary file
+as a final product, then you need to install SDKMAN from sdkman.io and then with sdk GraalVM (22.3.r17-nik). 
+Please know that for this project I'm using Java 17 Corretto from Amazon.
+Before you start to build the binary file with Maven, make sure that Runtime Environment is set to GraalVM as you can see bellow:
+```
+[root@republic]# java --version
+openjdk 17.0.5 2022-10-18 LTS
+OpenJDK Runtime Environment GraalVM 22.3.0 (build 17.0.5+8-LTS)
+OpenJDK 64-Bit Server VM GraalVM 22.3.0 (build 17.0.5+8-LTS, mixed mode, sharing)
+[root@republic]#
+```
+
+_Dash badge_
+
+[![wordtally - Unix wc tool replica](https://img.shields.io/badge/wordtally-Unix_wc_tool_replica-2ea44f)](https://github.com/valentinsoare)
+
+_Query parameter badge_
+
+[![wordtally - Unix wc tool replica](https://img.shields.io/static/v1?label=wordtally&message=Unix+wc+tool+replica&color=2ea44f)](https://github.com/valentinsoare)
+
+<br>
+
+:arrow_forward: Current UML diagram:
+
+[![WordTallyUMLDiagram.png](https://i.postimg.cc/ydT5MsVH/Word-Tally-UMLDiagram.png)](https://moviesondemand.io)
+
+<br>
+
+_Statistics_
+
+[![HitCount](https://hits.dwyl.com/valentinsoare/https://githubcom/valentinsoare/wordtally.svg?style=flat-square&show=unique)](http://hits.dwyl.com/valentinsoare/https://githubcom/valentinsoare/wordtally)
+
+_Social Buttons_
+
+[![valentinsoare - wordtally](https://img.shields.io/static/v1?label=valentinsoare&message=wordtally&color=blue&logo=github)](https://github.com/valentinsoare/wordtally "Go to GitHub repo")
+[![stars - wordtally](https://img.shields.io/github/stars/valentinsoare/wordtally?style=social)](https://github.com/valentinsoare/wordtally)
+[![forks - wordtally](https://img.shields.io/github/forks/valentinsoare/wordtally?style=social)](https://github.com/valentinsoare/wordtally)
+
+_Repo metadata_
+
+[![GitHub release](https://img.shields.io/github/release/valentinsoare/wordtally?include_prereleases=&sort=semver&color=blue)](https://github.com/valentinsoare/wordtally/releases/)
+[![License](https://img.shields.io/badge/License-MIT-blue)](#license)
+[![issues - wordtally](https://img.shields.io/github/issues/valentinsoare/wordtally)](https://github.com/valentinsoare/wordtally/issues)
+
+_Call-to-Action buttons_
+
+<div align="center">
+
+[![Use this template](https://img.shields.io/badge/Generate-Use_this_template-2ea44f?style=for-the-badge)](https://github.com/valentinsoare/wordtally/generate)
+
+
+</div>
+
+### License
+
+Released under [MIT](/LICENSE) by [@valentinsoare](https://github.com/valentinsoare).
