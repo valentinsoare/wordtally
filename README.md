@@ -3,7 +3,8 @@
 
 <br>
 
-:arrow_forward: Printing newline, word, and byte counts for each input file and a total number of lines if more than one FILE is specified. 
+:arrow_forward: A wc tool replica made in Java 17 to print a newline, word, char
+and byte counts for each input file and a total number of lines, words, bytes and chars if more than one FILE is specified. 
 A word is a non-zero-length sequence of printable characters delimited by white space.
 
 :arrow_forward: In case there is no file as input, the app will read from standard input. 
@@ -38,5 +39,17 @@ will be read from the stdin file descriptor of the process id of wordtally
 
 :white_check_mark: How to use it with short options and files as input.
 
-[![word-Tally-Short-Options.png](https://i.postimg.cc/qgHJKV1h/word-Tally-Short-Options.png)](https://moviesondemand.io)
+![](contentforreadmepage/WordTallyClassicOptions.gif)
+
+<br>
+
+:white_check_mark: Using it with short/long options with files or standard input.
+
+![](contentforreadmepage/WordTallyWithLongOptions.gif)
+
+<br>
+
+:white_check_mark: What happens when proper input is not provided (wrong options, files, etc).
+
+![](contentforreadmepage/WordTallyWithErrorsHelpAndRedirectToAnotherCommand.gif)
 
