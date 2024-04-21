@@ -73,6 +73,8 @@ OpenJDK 64-Bit Server VM GraalVM 22.3.0 (build 17.0.5+8-LTS, mixed mode, sharing
 [root@republic]#
 ```
 
+<br>
+
 :arrow_forward: Current UML diagram:
 
 [![WordTallyUMLDiagram.png](https://i.postimg.cc/ydT5MsVH/Word-Tally-UMLDiagram.png)](https://moviesondemand.io)
