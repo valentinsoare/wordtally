@@ -34,9 +34,7 @@ will be read from the stdin file descriptor of the process id of wordtally
 
 <br>
 
-### :arrow_forward: How To:
-
-<br>
+## :arrow_forward: How To:
 
 :white_check_mark: How to use it with short options and files as input.
 
