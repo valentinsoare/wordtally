@@ -81,7 +81,7 @@ OpenJDK 64-Bit Server VM GraalVM 22.3.0 (build 17.0.5+8-LTS, mixed mode, sharing
 
 _Statistics_
 
-[![HitCount](https://hits.dwyl.com/valentinsoare/https://githubcom/valentinsoare/wordtally.svg?style=flat-square&show=unique)](http://hits.dwyl.com/valentinsoare/https://githubcom/valentinsoare/wordtally)
+[![HitCount](https://hits.dwyl.com/valentinsoare/wordtally.svg?style=flat-square&show=unique)](http://hits.dwyl.com/valentinsoare/wordtally)
 
 _Social Buttons_
 
@@ -94,15 +94,6 @@ _Repo metadata_
 [![GitHub release](https://img.shields.io/github/release/valentinsoare/wordtally?include_prereleases=&sort=semver&color=blue)](https://github.com/valentinsoare/wordtally/releases/)
 [![License](https://img.shields.io/badge/License-MIT-blue)](#license)
 [![issues - wordtally](https://img.shields.io/github/issues/valentinsoare/wordtally)](https://github.com/valentinsoare/wordtally/issues)
-
-_Call-to-Action buttons_
-
-<div align="center">
-
-[![Use this template](https://img.shields.io/badge/Generate-Use_this_template-2ea44f?style=for-the-badge)](https://github.com/valentinsoare/wordtally/generate)
-
-
-</div>
 
 ### License
 
