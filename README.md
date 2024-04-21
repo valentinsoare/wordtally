@@ -1,5 +1,6 @@
 ## :abc: WordTally - Build Your Own wc Tool Coding Challenge
 > https://codingchallenges.fyi/challenges/challenge-wc/
+[![wordtally - Unix wc tool replica](https://img.shields.io/static/v1?label=wordtally&message=Unix+wc+tool+replica&color=2ea44f)](https://github.com/valentinsoare)
 
 <br>
 
@@ -70,16 +71,6 @@ OpenJDK Runtime Environment GraalVM 22.3.0 (build 17.0.5+8-LTS)
 OpenJDK 64-Bit Server VM GraalVM 22.3.0 (build 17.0.5+8-LTS, mixed mode, sharing)
 [root@republic]#
 ```
-
-_Dash badge_
-
-[![wordtally - Unix wc tool replica](https://img.shields.io/badge/wordtally-Unix_wc_tool_replica-2ea44f)](https://github.com/valentinsoare)
-
-_Query parameter badge_
-
-[![wordtally - Unix wc tool replica](https://img.shields.io/static/v1?label=wordtally&message=Unix+wc+tool+replica&color=2ea44f)](https://github.com/valentinsoare)
-
-<br>
 
 :arrow_forward: Current UML diagram:
 
