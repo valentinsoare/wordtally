@@ -37,13 +37,13 @@ will be read from the stdin file descriptor of the process id of wordtally
 
 ## :man_technologist: How To:
 
-:white_check_mark: How to use it with short options and files as input.
+:white_check_mark: Use it with short options and files as input.
 
 ![](contentforreadmepage/WordTallyClassicOptions.gif)
 
 <br>
 
-:white_check_mark: Using it with short/long options with files or standard input.
+:white_check_mark: Use it with short/long options with files or standard input.
 
 ![](contentforreadmepage/WordTallyWithLongOptions.gif)
 
