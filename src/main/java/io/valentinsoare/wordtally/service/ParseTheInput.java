@@ -21,7 +21,6 @@ import java.util.stream.Stream;
  * Here we defined several methods that are in fact used when files are given as arguments.
  * With these methods, we count the lines, words, chars and bytes in these files.
  * Almost all of them are used in async way and processing the files is done in parallel.
- *
  * Since it is async, we can process more files at a time in case it is needed and increase the throughput.
  */
 

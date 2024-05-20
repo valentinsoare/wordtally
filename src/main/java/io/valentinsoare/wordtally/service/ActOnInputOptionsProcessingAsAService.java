@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 /***
  * This class is tagged as a service and injected into the runner and
  * then called runTasksFromInput method from the runner to start the options and arguments processing.
- *
  * In other words, this method runTasksFromInput is the entry point into the app design system.
  */
 
@@ -162,115 +161,72 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
 
     @Override
     public void runTasksFromInput(String[] arguments, InputStream inputStream) {
-        try {
-            Map<String, List<String>> tasksAndFiles = extractTypeOfTasksAndLocationsFromInput(arguments);
-            List<String> options = tasksAndFiles.get("options"), locations = tasksAndFiles.get("locations");
-            Map<String, CompletableFuture<List<Long>>> results = new HashMap<>();
+        Map<String, List<String>> tasksAndFiles = extractTypeOfTasksAndLocationsFromInput(arguments);
+        List<String> options = tasksAndFiles.get("options"), locations = tasksAndFiles.get("locations");
+        Map<String, CompletableFuture<List<Long>>> results = new HashMap<>();
 
-            if (!locations.isEmpty()) {
-                List<String> filesToBeProcess = checkFilesAvailability(locations);
+        if (!locations.isEmpty()) {
+            List<String> filesToBeProcess = checkFilesAvailability(locations);
 
-                for (String f : filesToBeProcess) {
-                    Path file = Path.of(f);
+            for (String f : filesToBeProcess) {
+                Path file = Path.of(f);
 
-                    CompletableFuture<List<Long>> cfT =
-                            CompletableFuture.supplyAsync(() -> executeTasks(options, file));
-                    results.put(file.toString(), cfT);
-                }
-
-                Map<String, List<Long>> rs = CompletableFuture.allOf(results.values().toArray(e -> new CompletableFuture[]{}))
-                        .thenApplyAsync(w -> results.entrySet().stream()
-                                .collect(Collectors.toMap(Map.Entry::getKey, v -> v.getValue().join()))).join();
-
-                for (Map.Entry<String, List<Long>> e : rs.entrySet()) {
-                    constructOutputToPrint(e.getValue(), e.getKey(), true);
-                }
-
-                if (locations.size() > 1) {
-                    calculateTotalIfMultipleFilesAndPrint(
-                            new ArrayList<>(rs.values()),
-                            options.isEmpty() ? 3 : options.size()
-                    );
-                }
-            } else {
-                options.forEach(e -> {
-                    if ("help".equals(e)) {
-                        printHelp(requiredOptions);
-                    }
-                });
-
-                try {
-                    if (!parsingAsAService.checkTheReaderIsReady(inputStream)) {
-                        System.out.printf("wordtally: no input provided%nTry 'wordtally -h|--help' for more information.%n");
-                        System.exit(0);
-                    }
-
-                } catch (IOException e) {
-                    ErrorMessage msg = ErrorMessage.builder()
-                            .threadName(Thread.currentThread().getName())
-                            .clazzName(this.getClass().getName())
-                            .message(e.getMessage())
-                            .severity(Severity.ERROR)
-                            .methodName("runTasksFromInput")
-                            .dateTime(Instant.now().toString())
-                            .build();
-
-                    System.out.printf("%s %n", outputFormat.withJSONStyle().writeValueAsString(msg));
-                    System.exit(0);
-                }
-
-                List<Long> r = processingAsAService.execTheTasksWithCountingInParallelWithParallelStreams(options, inputStream);
-                constructOutputToPrint(r, null, false);
+                CompletableFuture<List<Long>> cfT =
+                        CompletableFuture.supplyAsync(() -> executeTasks(options, file));
+                results.put(file.toString(), cfT);
             }
 
-        } catch (JsonProcessingException e) {
-            ErrorMessage msg = ErrorMessage.builder()
-                    .message(e.getMessage())
-                    .dateTime(Instant.now().toString())
-                    .clazzName(this.getClass().toString())
-                    .methodName("decideTypeOfTaskForInputFromDescriptor")
-                    .severity(Severity.ERROR)
-                    .threadName(Thread.currentThread().getName())
-                    .build();
+            Map<String, List<Long>> rs = CompletableFuture.allOf(results.values().toArray(e -> new CompletableFuture[]{}))
+                    .thenApplyAsync(w -> results.entrySet().stream()
+                            .collect(Collectors.toMap(Map.Entry::getKey, v -> v.getValue().join()))).join();
 
-            try {
-                System.out.printf("%s%n", outputFormat.withJSONStyle().writeValueAsString(msg));
-            } catch (JsonProcessingException ex) {
-                throw new RuntimeException(ex);
+            for (Map.Entry<String, List<Long>> e : rs.entrySet()) {
+                constructOutputToPrint(e.getValue(), e.getKey(), true);
             }
+
+            if (locations.size() > 1) {
+                calculateTotalIfMultipleFilesAndPrint(
+                        new ArrayList<>(rs.values()),
+                        options.isEmpty() ? 3 : options.size()
+                );
+            }
+        } else {
+            options.forEach(e -> {
+                if ("help".equals(e)) {
+                    printHelp(requiredOptions);
+                }
+            });
+
+            catchCheckTheReaderException(inputStream);
+
+            List<Long> r = processingAsAService.execTheTasksWithCountingInParallelWithParallelStreams(options, inputStream);
+            constructOutputToPrint(r, null, false);
         }
+
     }
 
     @Override
     public List<Long> executeTasks(List<String> options, Path inputFile) {
-        CompletableFuture<Long> cfnL, cfnW, cfnC, cfnB;
         List<CompletableFuture<Long>> allCFs = new ArrayList<>();
 
         if (options.isEmpty()) {
-            cfnL = parsingAsAService.countTheNumberOfLines(inputFile);
-            cfnW = parsingAsAService.countTheNumberOfWords(inputFile);
-            cfnB = parsingAsAService.countTheNumberOfBytes(inputFile);
-
-            allCFs.addAll(Arrays.asList(cfnL, cfnW, cfnB));
+            allCFs.addAll(Arrays.asList(
+                    parsingAsAService.countTheNumberOfLines(inputFile),
+                    parsingAsAService.countTheNumberOfWords(inputFile),
+                    parsingAsAService.countTheNumberOfBytes(inputFile))
+            );
         } else {
             for (String s : options) {
                 switch (s) {
                     case "help" -> printHelp(requiredOptions);
                     case "lines" -> {
-                        cfnL = parsingAsAService.countTheNumberOfLines(inputFile);
-                        allCFs.add(cfnL);
-                    }
-                    case "words" -> {
-                        cfnW = parsingAsAService.countTheNumberOfWords(inputFile);
-                        allCFs.add(cfnW);
-                    }
-                    case "chars" -> {
-                        cfnC = parsingAsAService.countTheNumberOfChars(inputFile);
-                        allCFs.add(cfnC);
-                    }
-                    case "bytes" -> {
-                        cfnB = parsingAsAService.countTheNumberOfBytes(inputFile);
-                        allCFs.add(cfnB);
+                        allCFs.add(parsingAsAService.countTheNumberOfLines(inputFile));
+                    } case "words" -> {
+                        allCFs.add(parsingAsAService.countTheNumberOfWords(inputFile));
+                    } case "chars" -> {
+                        allCFs.add(parsingAsAService.countTheNumberOfChars(inputFile));
+                    } case "bytes" -> {
+                        allCFs.add(parsingAsAService.countTheNumberOfBytes(inputFile));
                     }
                 }
             }
@@ -280,5 +236,31 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
                 .thenApply(v -> allCFs.stream()
                         .map(CompletableFuture::join)
                         .toList()).join();
+    }
+
+    private void catchCheckTheReaderException(InputStream inputStream) {
+        try {
+            if (!parsingAsAService.checkTheReaderIsReady(inputStream)) {
+                System.out.printf("wordtally: no input provided%nTry 'wordtally -h|--help' for more information.%n");
+                System.exit(0);
+            }
+        } catch (IOException e) {
+            ErrorMessage msg = ErrorMessage.builder()
+                    .threadName(Thread.currentThread().getName())
+                    .clazzName(this.getClass().getName())
+                    .message(e.getMessage())
+                    .severity(Severity.ERROR)
+                    .methodName("runTasksFromInput")
+                    .dateTime(Instant.now().toString())
+                    .build();
+
+            try {
+                System.out.printf("%s %n", outputFormat.withJSONStyle().writeValueAsString(msg));
+            } catch (JsonProcessingException ex) {
+                throw new RuntimeException(ex);
+            }
+
+            System.exit(0);
+        }
     }
 }

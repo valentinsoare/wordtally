@@ -19,8 +19,21 @@ public class ErrorMessage {
     private String message;
     private String dateTime;
 
+    /**
+     * Default constructor for ErrorMessage class.
+     */
     public ErrorMessage() {}
 
+    /**
+     * Parameterized constructor for ErrorMessage class.
+     *
+     * @param severity   The severity level of the error.
+     * @param clazzName  The name of the class where the error occurred.
+     * @param methodName The name of the method where the error occurred.
+     * @param threadName The name of the thread where the error occurred.
+     * @param message    The error message.
+     * @param dateTime   The date and time when the error occurred.
+     */
     public ErrorMessage(Severity severity, String clazzName, String methodName,
                         String threadName, String message, String dateTime) {
         this.severity = severity;
@@ -31,6 +44,11 @@ public class ErrorMessage {
         this.dateTime = dateTime;
     }
 
+    /**
+     * Overrides the default toString method.
+     *
+     * @return A string representation of the ErrorMessage object.
+     */
     @Override
     public String toString() {
         return String.format("Severity: %s, ClazzName: %s, MethodName: %s, ThreadName: %s, Message: %s, DateTime: %s",

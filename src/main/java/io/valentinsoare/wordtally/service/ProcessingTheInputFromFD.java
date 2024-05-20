@@ -17,11 +17,9 @@ import java.util.List;
 /***
  *  Here, as you can see by the name, we have the design on how to process the input coming from inputStream (System.in)
  * Here we tackle the input data in a simple way.
- *
  * This is the first version, but in the next one I will use async and parallel processing here and define more methods, one per type of task. In this case, each time we call a method
  * we need to mark the BufferReader object, and then if another method is called, we do a reader. Reset to reset the inputStream to
  * beginning and then mark it again and start the app logic.
- *
  * Also, we are going to need more BufferReader objects, one BufferReader per type of task,
  * and when we create these bufferReaders, we need to use reset in other to go to the beginning of the initial inputStream
  * */
@@ -43,7 +41,7 @@ public class ProcessingTheInputFromFD implements ProcessingAsAService {
 
         if (toCountBytes) {
             int readBytes;
-            byte[] buffer = new byte[1024];
+            byte[] buffer = new byte[2048];
 
             try {
                 while ((readBytes = inputStream.read(buffer)) != -1) {

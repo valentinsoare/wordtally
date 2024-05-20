@@ -14,8 +14,17 @@ import org.springframework.stereotype.Component;
 public class OutputFormat {
     private ObjectMapper jsonStyle;
 
+    /**
+     * Default constructor for OutputFormat class.
+     */
     public OutputFormat() {}
 
+    /**
+     * This method returns an ObjectMapper configured to handle Java Time objects.
+     * If the ObjectMapper has not been initialized, it creates a new one and registers the JavaTimeModule to it.
+     *
+     * @return An ObjectMapper configured to handle Java Time objects.
+     */
     public ObjectMapper withJSONStyle() {
         if (jsonStyle == null) {
             jsonStyle = new ObjectMapper();
