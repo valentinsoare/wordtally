@@ -10,9 +10,8 @@ import org.springframework.stereotype.Service;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Stream;
 
 /***
  *  Here, as you can see by the name, we have the design on how to process the input coming from inputStream (System.in)
@@ -35,7 +34,8 @@ public class ProcessingTheInputFromFD implements ProcessingAsAService {
     }
 
     @Override
-    public List<Long> countingAndPrinting(InputStream inputStream, boolean toCountLines, boolean toCountWords, boolean toCountChars, boolean toCountBytes) {
+    public List<Long> countingAndPrinting(InputStream inputStream, boolean toCountLines, boolean toCountWords,
+                                          boolean toCountChars, boolean toCountBytes) throws IOException {
         long numberOfChars = 0, numberOfLines = 0, numberOfWords = 0, numberOfBytes = 0;
         inputStream.mark(Integer.MAX_VALUE);
 
@@ -43,102 +43,89 @@ public class ProcessingTheInputFromFD implements ProcessingAsAService {
             int readBytes;
             byte[] buffer = new byte[2048];
 
-            try {
-                while ((readBytes = inputStream.read(buffer)) != -1) {
-                    numberOfBytes += readBytes;
-                }
-            } catch (IOException r) {
-                ErrorMessage msg = ErrorMessage.builder()
-                        .methodName("countingAndPrinting")
-                        .threadName(Thread.currentThread().getName())
-                        .clazzName(this.getClass().getName())
-                        .dateTime(Instant.now().toString())
-                        .severity(Severity.ERROR)
-                        .message(r.getMessage())
-                        .build();
-
-                try {
-                    System.out.printf("%s %n", outputFormat.withJSONStyle().writeValueAsString(msg));
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
-                }
+            while ((readBytes = inputStream.read(buffer)) != -1) {
+                numberOfBytes += readBytes;
             }
         }
 
-        try {
-            int byteRead;
-            boolean isWord = false;
+        int byteRead;
+        boolean isWord = false;
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
-            inputStream.reset();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+        inputStream.reset();
 
-            while ((byteRead = reader.read()) != -1) {
+        while ((byteRead = reader.read()) != -1) {
 
-                if ((toCountLines) && (byteRead == '\n')) {
-                    numberOfLines += 1;
-                }
+            if ((toCountLines) && (byteRead == '\n')) {
+                numberOfLines += 1;
+            }
 
-                if (toCountWords) {
-                    if (Character.isWhitespace(byteRead)) {
-                        if (isWord) {
-                            isWord = false;
-                        }
-                    } else {
-                        if (!isWord) {
-                            isWord = true;
-                            numberOfWords += 1;
-                        }
+            if (toCountWords) {
+                if (Character.isWhitespace(byteRead)) {
+                    if (isWord) {
+                        isWord = false;
+                    }
+                } else {
+                    if (!isWord) {
+                        isWord = true;
+                        numberOfWords += 1;
                     }
                 }
-
-                if (toCountChars) {
-                    numberOfChars += 1;
-                }
             }
 
-        } catch (IOException er) {
-            ErrorMessage msg = ErrorMessage.builder()
-                    .threadName(Thread.currentThread().getName())
-                    .methodName("countingAndPrinting")
-                    .clazzName(this.getClass().getName())
-                    .message(er.getMessage())
-                    .dateTime(Instant.now().toString())
-                    .severity(Severity.ERROR)
-                    .build();
-
-            try {
-                System.out.printf("%s %n", outputFormat.withJSONStyle().writeValueAsString(msg));
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
+            if (toCountChars) {
+                numberOfChars += 1;
             }
         }
 
-        List<Long> tmp = new ArrayList<>(Arrays.asList(
-                numberOfLines, numberOfWords, numberOfChars, numberOfBytes
-        ));
-
-        List<Long> end = new ArrayList<>();
-
-        tmp.forEach(e -> {
-            if (e != 0) end.add(e);
-        });
-
-        return end;
+        return Stream.of(numberOfLines, numberOfWords, numberOfChars, numberOfBytes)
+                .filter(e -> e != 0)
+                .toList();
     }
 
     @Override
     public List<Long> execTheTasksWithCountingInParallelWithParallelStreams(List<String> options, InputStream inputStream) {
-        boolean toCountLines = false, toCountWords = false, toCountChars = false, toCountBytes = false;
+        Map<String, Boolean> taskOptions = initializeTaskOptions(options);
 
-        for (String s : options) {
-            switch (s) {
-                case "lines" -> toCountLines = true;
-                case "words" -> toCountWords = true;
-                case "chars" -> toCountChars = true;
-                case "bytes" -> toCountBytes = true;
-            }
+        try {
+            return performCountingTasks(inputStream, taskOptions);
+        } catch (IOException e) {
+            handleIOException(e, "executeTasksWithParallelStreams");
+            return Collections.emptyList();
         }
+    }
 
-        return countingAndPrinting(inputStream, toCountLines, toCountWords, toCountChars, toCountBytes);
+    private Map<String, Boolean> initializeTaskOptions(List<String> options) {
+        Map<String, Boolean> taskOptions = new HashMap<>();
+
+        taskOptions.put("lines", options.contains("lines"));
+        taskOptions.put("words", options.contains("words"));
+        taskOptions.put("chars", options.contains("chars"));
+        taskOptions.put("bytes", options.contains("bytes"));
+
+        return taskOptions;
+    }
+
+    private List<Long> performCountingTasks(InputStream inputStream, Map<String, Boolean> taskOptions) throws IOException {
+        return countingAndPrinting(inputStream, taskOptions.get("lines"), taskOptions.get("words"),
+                taskOptions.get("chars"), taskOptions.get("bytes")
+        );
+    }
+
+    private void handleIOException(IOException e, String methodName) {
+        ErrorMessage msg = ErrorMessage.builder()
+                .threadName(Thread.currentThread().getName())
+                .methodName(methodName)
+                .clazzName(this.getClass().getName())
+                .message(e.getMessage())
+                .dateTime(Instant.now().toString())
+                .severity(Severity.ERROR)
+                .build();
+
+        try {
+            System.out.printf("%s %n", outputFormat.withJSONStyle().writeValueAsString(msg));
+        } catch (JsonProcessingException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 }

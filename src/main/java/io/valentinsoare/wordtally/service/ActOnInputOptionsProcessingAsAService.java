@@ -219,15 +219,10 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
             for (String s : options) {
                 switch (s) {
                     case "help" -> printHelp(requiredOptions);
-                    case "lines" -> {
-                        allCFs.add(parsingAsAService.countTheNumberOfLines(inputFile));
-                    } case "words" -> {
-                        allCFs.add(parsingAsAService.countTheNumberOfWords(inputFile));
-                    } case "chars" -> {
-                        allCFs.add(parsingAsAService.countTheNumberOfChars(inputFile));
-                    } case "bytes" -> {
-                        allCFs.add(parsingAsAService.countTheNumberOfBytes(inputFile));
-                    }
+                    case "lines" -> allCFs.add(parsingAsAService.countTheNumberOfLines(inputFile));
+                    case "words" -> allCFs.add(parsingAsAService.countTheNumberOfWords(inputFile));
+                    case "chars" -> allCFs.add(parsingAsAService.countTheNumberOfChars(inputFile));
+                    case "bytes" -> allCFs.add(parsingAsAService.countTheNumberOfBytes(inputFile));
                 }
             }
         }
