@@ -81,8 +81,6 @@ OpenJDK 64-Bit Server VM GraalVM 22.3.0 (build 17.0.5+8-LTS, mixed mode, sharing
 
 <br>
 
-[![HitCount](https://hits.dwyl.com/valentinsoare/wordtally.svg?style=flat-square&show=unique)](http://hits.dwyl.com/valentinsoare/wordtally)
-
 [![valentinsoare - wordtally](https://img.shields.io/static/v1?label=valentinsoare&message=wordtally&color=blue&logo=github)](https://github.com/valentinsoare/wordtally "Go to GitHub repo")
 [![stars - wordtally](https://img.shields.io/github/stars/valentinsoare/wordtally?style=social)](https://github.com/valentinsoare/wordtally)
 [![forks - wordtally](https://img.shields.io/github/forks/valentinsoare/wordtally?style=social)](https://github.com/valentinsoare/wordtally)
