@@ -213,8 +213,7 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
             allCFs.addAll(Arrays.asList(
                     parsingAsAService.countTheNumberOfLines(inputFile),
                     parsingAsAService.countTheNumberOfWords(inputFile),
-                    parsingAsAService.countTheNumberOfBytes(inputFile))
-            );
+                    parsingAsAService.countTheNumberOfBytes(inputFile)));
         } else {
             for (String s : options) {
                 switch (s) {
