@@ -20,8 +20,8 @@ public class DynamicThreadPoolManager implements TaskExecutor {
     private ThreadPoolExecutor threadPoolExecutor;
 
     private DynamicThreadPoolManager() {
-        this.corePoolSize = 6;
-        this.maxPoolSize = 10;
+        this.corePoolSize = 2;
+        this.maxPoolSize = 6;
         this.keepAliveTime = 35;
         this.arrayQueueSize = 500;
         this.nameOfTheWorkingThread = "working-thread";

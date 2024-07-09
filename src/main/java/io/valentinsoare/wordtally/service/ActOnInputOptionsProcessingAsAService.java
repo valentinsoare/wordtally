@@ -202,7 +202,6 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
             List<Long> r = processingAsAService.execTheTasksWithCountingInParallelWithParallelStreams(options, inputStream);
             constructOutputToPrint(r, null, false);
         }
-
     }
 
     @Override
@@ -235,7 +234,7 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
     private void catchCheckTheReaderException(InputStream inputStream) {
         try {
             if (!parsingAsAService.checkTheReaderIsReady(inputStream)) {
-                System.out.printf("wordtally: no input provided%nTry 'wordtally -h|--help' for more information.%n");
+                System.out.printf("wordtally: no input p rovided%nTry 'wordtally -h|--help' for more information.%n");
                 System.exit(0);
             }
         } catch (IOException e) {
