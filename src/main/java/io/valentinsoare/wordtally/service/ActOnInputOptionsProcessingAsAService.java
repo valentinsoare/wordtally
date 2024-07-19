@@ -72,8 +72,10 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
         try (PrintWriter printWriter = new PrintWriter(System.out)) {
             printWriter.printf("%nWordTally v0.0.1%n");
 
-            printWriter.printf("%n%s%n%n",
-                    "Application counts the number of lines, words, characters, and bytes\nfrom one or more text files or from keyboard and prints the results to standard output.");
+            printWriter.printf("%n%s%n%s%n%s%n%n",
+                    "Application counts the number of lines, words, characters, and bytes\nfrom one or more text files or from keyboard and prints the results to standard output.",
+                    "It's not possible to count the number of lines or words in binary files or another type of special files that are not text.",
+                    "For these you can count only bytes or chars.");
             helpFormatter.printUsage(printWriter, 100, "java -jar wordtally.jar [OPTION]...  [FILE]...");
             helpFormatter.printOptions(printWriter, 100, options, 2, 5);
             printWriter.printf("%n%s%n%n", "WordTally was written by Valentin Soare.\nPlease report any bugs to soarevalentinn@gmail.com.");
@@ -141,8 +143,17 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
         return availableFiles;
     }
 
-    private void constructOutputToPrint(List<Long> results, String fileToPrint, boolean toPrintLocation) {
-        results.forEach(e -> System.out.printf("%-7s", e));
+    private void constructOutputToPrint(List<Long> results, String fileToPrint) {
+        boolean toPrintLocation = false;
+
+        for (long value : results) {
+            toPrintLocation = false;
+
+            if (value >= 0) {
+                System.out.printf("%-9s", value);
+                toPrintLocation = true;
+            }
+        }
 
         if (toPrintLocation) {
             System.out.printf("%s%n", fileToPrint);
@@ -159,8 +170,18 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
                 calcTotal.set(i, givenValuesFromCounter.get(j).get(i) + calcTotal.get(i));
         }
 
-        calcTotal.forEach(e -> System.out.printf("%-7s", e));
-        System.out.printf("%-7s%n", "total");
+        boolean toPrintTotalTag = false;
+
+        for (long value : calcTotal) {
+            if (value >= 0) {
+                toPrintTotalTag = true;
+                System.out.printf("%-9s", value);
+            }
+        }
+
+        if (toPrintTotalTag) {
+            System.out.printf("%-9s%n", "total");
+        }
     }
 
     @Override
@@ -185,7 +206,7 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
                             .collect(Collectors.toMap(Map.Entry::getKey, v -> v.getValue().join()))).join();
 
             for (Map.Entry<String, List<Long>> e : rs.entrySet()) {
-                constructOutputToPrint(e.getValue(), e.getKey(), true);
+                constructOutputToPrint(e.getValue(), e.getKey());
             }
 
             if (locations.size() > 1) {
@@ -204,7 +225,7 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
             catchCheckTheReaderException(inputStream);
 
             List<Long> r = processingAsAService.execTheTasksWithCountingInParallelWithParallelStreams(options, inputStream);
-            constructOutputToPrint(r, null, false);
+            constructOutputToPrint(r, null);
         }
     }
 
