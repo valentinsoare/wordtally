@@ -9,11 +9,13 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.nio.charset.MalformedInputException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 
@@ -54,6 +56,8 @@ public class ParseTheInput implements ParsingAsAService {
             } catch (JsonProcessingException ex) {
                 throw new RuntimeException(ex);
             }
+        } catch (CompletionException | UncheckedIOException f) {
+            System.out.printf("wordtally: %s: Cannot count number of lines for this format.%n", inputFile);
         }
 
         return CompletableFuture.completedFuture(-1L);
@@ -119,6 +123,8 @@ public class ParseTheInput implements ParsingAsAService {
             } catch (JsonProcessingException ex) {
                 throw new RuntimeException(ex);
             }
+        } catch (CompletionException | UncheckedIOException f) {
+            System.out.printf("wordtally: %s: Cannot count number of words for this format.%n", inputFile);
         }
 
         return CompletableFuture.completedFuture(-1L);
