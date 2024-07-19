@@ -12,7 +12,7 @@ public interface InputOptionsAsArguments {
     Map<String, List<String>> extractTypeOfTasksAndLocationsFromInput(String[] arguments) throws ParseException;
     void runTasksFromInput(String[] arguments, InputStream inputStream);
     void printHelp(Options options);
-    List<String> checkFilesAvailability(List<String> locations);
+    List<String> checkFilesAvailabilityAndPermissions(List<String> locations);
     List<Long> executeTasks(List<String> options, Path inputFile) throws InterruptedException;
 
 }

@@ -20,7 +20,7 @@ import java.io.*;
 @Component
 public class ApplicationRunner implements CommandLineRunner {
 
-    private InputStream inputStream;
+    private final InputStream inputStream;
 
     private final InputOptionsAsArguments actOnInputOptionsAsArguments;
 
@@ -44,4 +44,5 @@ public class ApplicationRunner implements CommandLineRunner {
         actOnInputOptionsAsArguments.runTasksFromInput(args, inputStream);
         System.exit(0);
     }
+
 }
