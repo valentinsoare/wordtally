@@ -123,12 +123,16 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
     }
 
     @Override
-    public List<String> checkFilesAvailability(List<String> locations) {
+    public List<String> checkFilesAvailabilityAndPermissions(List<String> locations) {
         List<String> availableFiles = new ArrayList<>();
 
         locations.parallelStream().forEach(f -> {
-            if (Files.notExists(Path.of(f))) {
+            if (new File(f).isDirectory()) {
+                System.out.printf("wordtally: %s: Is a directory%n", f);
+            } else if (Files.notExists(Path.of(f))) {
                 System.out.printf("wordtally: %s: No such file or directory%n", f);
+            } else if (!new File(f).canRead()) {
+                System.out.printf("wordtally: %s: No read permissions%n", f);
             } else {
                 availableFiles.add(f);
             }
@@ -166,7 +170,7 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
         Map<String, CompletableFuture<List<Long>>> results = new HashMap<>();
 
         if (!locations.isEmpty()) {
-            List<String> filesToBeProcess = checkFilesAvailability(locations);
+            List<String> filesToBeProcess = checkFilesAvailabilityAndPermissions(locations);
 
             for (String f : filesToBeProcess) {
                 Path file = Path.of(f);
