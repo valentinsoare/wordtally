@@ -9,7 +9,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
-import java.nio.charset.MalformedInputException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -69,7 +68,8 @@ public class ParseTheInput implements ParsingAsAService {
         int bR = 0;
         long numberOfChars = 0;
 
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(Files.newInputStream(inputFile), StandardCharsets.UTF_8))) {
+        try (BufferedReader reader =
+                     new BufferedReader(new InputStreamReader(Files.newInputStream(inputFile), StandardCharsets.UTF_8))) {
             while ((bR = reader.read()) != -1) {
                 numberOfChars += 1;
             }
@@ -134,7 +134,7 @@ public class ParseTheInput implements ParsingAsAService {
     @Override
     public CompletableFuture<Long> countTheNumberOfBytes(Path inputFile) {
 
-        try (InputStream inputStream = Files.newInputStream(inputFile)){
+        try (InputStream inputStream = Files.newInputStream(inputFile)) {
             long bytesCount = 0;
 
             int byteRead;
