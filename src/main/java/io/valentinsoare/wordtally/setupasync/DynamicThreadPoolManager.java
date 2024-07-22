@@ -6,8 +6,14 @@ import org.springframework.core.task.TaskExecutor;
 import java.util.concurrent.*;
 
 
-/***
- * Here we defined the ThreadPoolExecutor with values that are given when creating the object from AsynchronousConfiguration class.
+/**
+ * Manages dynamic thread pools for asynchronous task execution within the application.
+ * Implements {@link TaskExecutor} to provide a custom thread pool execution strategy.
+ * This manager allows for the configuration of core and maximum pool sizes, keep alive time, and queue size,
+ * enabling fine-tuned control over resource allocation and task execution behavior.
+ *
+ * The thread pool is configured with a custom {@link ThreadFactory} for naming threads for easier debugging and monitoring,
+ * and a {@link RejectedExecutionHandler} to handle tasks that cannot be executed immediately.
  */
 
 public class DynamicThreadPoolManager implements TaskExecutor {
@@ -19,6 +25,12 @@ public class DynamicThreadPoolManager implements TaskExecutor {
     private String nameOfTheWorkingThread;
     private ThreadPoolExecutor threadPoolExecutor;
 
+    /**
+     * Private constructor to prevent direct instantiation.
+     * Initializes the thread pool with predefined configurations for core pool size, maximum pool size,
+     * keep alive time, and queue size. It also sets a custom thread factory for naming threads and a rejection handler
+     * for tasks that cannot be executed immediately.
+     */
     private DynamicThreadPoolManager() {
         this.corePoolSize = 2;
         this.maxPoolSize = 6;
@@ -43,10 +55,22 @@ public class DynamicThreadPoolManager implements TaskExecutor {
         );
     }
 
+    /**
+     * Factory method to create a new instance of {@link DynamicThreadPoolManager}.
+     * This method ensures that the thread pool manager is instantiated with the default configuration.
+     *
+     * @return A new instance of {@link DynamicThreadPoolManager}.
+     */
     public static DynamicThreadPoolManager generateNewDynamicThreadPoolManager() {
         return new DynamicThreadPoolManager();
     }
 
+    /**
+     * Executes a given task in the thread pool.
+     * This method delegates the execution of the task to the {@link ThreadPoolExecutor} instance managed by this class.
+     *
+     * @param task The task to be executed.
+     */
     @Override
     public void execute(Runnable task) {
         threadPoolExecutor.execute(task);

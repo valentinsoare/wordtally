@@ -9,14 +9,33 @@ import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
 
+/**
+ * Custom exception handler for handling uncaught exceptions in asynchronous operations.
+ * Implements {@link AsyncUncaughtExceptionHandler} to provide a mechanism for dealing with exceptions
+ * that occur during the execution of asynchronous methods.
+ */
 public class AsynchronousExceptionHandler implements AsyncUncaughtExceptionHandler {
 
     private final OutputFormat outputFormat;
 
+    /**
+     * Constructs an AsynchronousExceptionHandler with a specific output format.
+     * This output format is used to format the exception messages before printing them.
+     *
+     * @param outputFormat The {@link OutputFormat} used for formatting exception messages.
+     */
     public AsynchronousExceptionHandler(OutputFormat outputFormat) {
         this.outputFormat = outputFormat;
     }
 
+    /**
+     * Handles uncaught exceptions thrown during asynchronous method execution.
+     * Formats the exception details and prints them using the specified {@link OutputFormat}.
+     *
+     * @param ex The exception that was thrown.
+     * @param method The method during which the exception was thrown.
+     * @param params The parameters with which the method was called.
+     */
     @Override
     public void handleUncaughtException(Throwable ex, Method method, Object... params) {
         ErrorMessage msg = ErrorMessage.builder()

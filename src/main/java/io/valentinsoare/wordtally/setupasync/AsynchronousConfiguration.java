@@ -18,8 +18,19 @@ import java.util.concurrent.Executor;
 public class AsynchronousConfiguration implements AsyncConfigurer {
     private DynamicThreadPoolManager defaultDynamicThreadPoolManager;
 
+    /**
+     * Default constructor for {@link AsynchronousConfiguration}.
+     * Initializes a new instance of the configuration class without any initial setup.
+     */
     public AsynchronousConfiguration() {}
 
+    /**
+     * Provides the executor for asynchronous task execution.
+     * This method ensures that a single {@link DynamicThreadPoolManager} instance is used across the application,
+     * following the singleton design pattern.
+     *
+     * @return An instance of {@link Executor} that manages asynchronous task execution.
+     */
     @Override
     public Executor getAsyncExecutor() {
         if (defaultDynamicThreadPoolManager == null) {
@@ -29,6 +40,13 @@ public class AsynchronousConfiguration implements AsyncConfigurer {
         return defaultDynamicThreadPoolManager;
     }
 
+    /**
+     * Provides the exception handler for uncaught exceptions in asynchronous methods.
+     * This method creates a new {@link AsynchronousExceptionHandler} instance, which uses {@link OutputFormat}
+     * for formatting exception messages.
+     *
+     * @return An instance of {@link AsyncUncaughtExceptionHandler} for handling exceptions in asynchronous methods.
+     */
     @Override
     public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
         return new AsynchronousExceptionHandler(new OutputFormat());
