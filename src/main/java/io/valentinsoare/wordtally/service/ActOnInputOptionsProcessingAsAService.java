@@ -29,6 +29,15 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
     private final ProcessingAsAService processingAsAService;
     private Options requiredOptions;
 
+    /**
+     * Constructor for ActOnInputOptionsProcessingAsAService.
+     * It initializes the service with dependencies for output formatting, parsing, and processing.
+     * Also, it prepares the command line options that will be available for the user.
+     *
+     * @param outputFormat The service for formatting output.
+     * @param parsingAsAService The service for parsing input.
+     * @param processingAsAService The service for processing the input.
+     */
     @Autowired
     private ActOnInputOptionsProcessingAsAService(OutputFormat outputFormat,
                                                  ParsingAsAService parsingAsAService,
@@ -40,6 +49,10 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
         prepareOptionsAvailable();
     }
 
+    /**
+     * Prepares the command line options that the application will accept.
+     * This includes options for counting lines, words, characters, bytes, and displaying help.
+     */
     private void prepareOptionsAvailable() {
         this.requiredOptions = new Options();
 
@@ -56,6 +69,14 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
                 .addOption(help);
     }
 
+    /**
+     * Creates a command line option.
+     *
+     * @param shortName The short name of the option (e.g., "l" for lines).
+     * @param longName The long name of the option (e.g., "lines").
+     * @param description A description of what the option does.
+     * @return The created Option object.
+     */
     private Option createOption(String shortName, String longName,
                                 String description) {
         return Option.builder(shortName)
@@ -65,6 +86,12 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
                 .build();
     }
 
+    /**
+     * Prints the help message to the console.
+     * This includes a brief description of the application, usage instructions, and a list of all available options.
+     *
+     * @param options The command line options to include in the help message.
+     */
     @Override
     public void printHelp(Options options) {
         HelpFormatter helpFormatter = new HelpFormatter();
@@ -84,6 +111,13 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
         System.exit(0);
     }
 
+    /**
+     * Extracts and categorizes command line arguments into options and file locations.
+     * It parses the command line arguments to distinguish between options (e.g., "-l", "--words") and file paths.
+     *
+     * @param arguments The command line arguments passed to the application.
+     * @return A map with two keys: "options" for command line options and "locations" for file paths.
+     */
     @Override
     public Map<String, List<String>> extractTypeOfTasksAndLocationsFromInput(String[] arguments) {
         List<String> optionsFromUser = new ArrayList<>();
@@ -124,6 +158,13 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
         return optionsAndLocationsFromUser;
     }
 
+    /**
+     * Checks the availability and read permissions of the files specified in the command line arguments.
+     * It filters out directories, non-existent files, and files without read permissions, printing appropriate messages for each.
+     *
+     * @param locations A list of file paths to check.
+     * @return A list of file paths that are available and readable.
+     */
     @Override
     public List<String> checkFilesAvailabilityAndPermissions(List<String> locations) {
         List<String> availableFiles = new ArrayList<>();
@@ -143,6 +184,13 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
         return availableFiles;
     }
 
+    /**
+     * Constructs the output to be printed to the console for each file processed.
+     * It formats the results (for example, counts of lines, words, characters, bytes) and prints them alongside the file name.
+     *
+     * @param results The list of result counts to print.
+     * @param fileToPrint The name of the file these results correspond to.
+     */
     private void constructOutputToPrint(List<Long> results, String fileToPrint) {
         boolean toPrintLocation = false;
 
@@ -162,6 +210,13 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
         }
     }
 
+    /**
+     * Calculates and prints the total counts for all files if multiple files were processed.
+     * It sums up the counts for each metric (lines, words, characters, bytes) across all files and prints the totals.
+     *
+     * @param givenValuesFromCounter A list of lists, where each inner list contains the counts for a single file.
+     * @param nCol The number of columns to print, determined by the number of options specified by the user.
+     */
     private void calculateTotalIfMultipleFilesAndPrint(List<List<Long>> givenValuesFromCounter, int nCol) {
         List<Long> calcTotal = new ArrayList<>(givenValuesFromCounter.get(0));
 
@@ -184,6 +239,13 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
         }
     }
 
+    /**
+     * The main method that orchestrates the processing of input tasks from command line arguments or standard input.
+     * It extracts tasks and file locations from the input, checks file permissions, and processes each file or standard input accordingly.
+     *
+     * @param arguments The command line arguments.
+     * @param inputStream The standard input stream, used if no files are specified.
+     */
     @Override
     public void runTasksFromInput(String[] arguments, InputStream inputStream) {
         Map<String, List<String>> tasksAndFiles = extractTypeOfTasksAndLocationsFromInput(arguments);
@@ -229,6 +291,14 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
         }
     }
 
+    /**
+     * Executes the specified tasks (e.g., counting lines, words, characters, bytes) on a given file.
+     * It processes the file according to the options provided and returns the counts as a list of long values.
+     *
+     * @param options A list of options specifying which counts to calculate.
+     * @param inputFile The path to the file to be processed.
+     * @return A list of long values representing the counts for each requested metric.
+     */
     @Override
     public List<Long> executeTasks(List<String> options, Path inputFile) {
         List<CompletableFuture<Long>> allCFs = new ArrayList<>();
@@ -256,10 +326,16 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
                         .toList()).join();
     }
 
+    /**
+     * Checks if the input stream is ready and prints an error message if no input is provided.
+     * This method is used to ensure that there is input available when the application expects to read from standard input.
+     *
+     * @param inputStream The input stream to check.
+     */
     private void catchCheckTheReaderException(InputStream inputStream) {
         try {
             if (!parsingAsAService.checkTheReaderIsReady(inputStream)) {
-                System.out.printf("wordtally: no input p rovided%nTry 'wordtally -h|--help' for more information.%n");
+                System.out.printf("wordtally: no input provided%nTry 'wordtally -h|--help' for more information.%n");
                 System.exit(0);
             }
         } catch (IOException e) {

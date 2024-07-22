@@ -28,11 +28,28 @@ public class ProcessingTheInputFromFD implements ProcessingAsAService {
 
     private final OutputFormat outputFormat;
 
+    /**
+     * Constructor that initializes the service with a dependency for formatting output messages.
+     *
+     * @param outputFormat The service for formatting output.
+     */
     @Autowired
     public ProcessingTheInputFromFD(OutputFormat outputFormat) {
         this.outputFormat = outputFormat;
     }
 
+    /**
+     * Counts and prints the number of lines, words, characters, and bytes from an input stream based on specified flags.
+     * This method demonstrates a basic approach to processing input, with future enhancements planned for parallel execution.
+     *
+     * @param inputStream The input stream to be processed.
+     * @param toCountLines Flag indicating whether to count lines.
+     * @param toCountWords Flag indicating whether to count words.
+     * @param toCountChars Flag indicating whether to count characters.
+     * @param toCountBytes Flag indicating whether to count bytes.
+     * @return A list of long values representing the counts of the specified elements.
+     * @throws IOException If an I/O error occurs during processing.
+     */
     @Override
     public List<Long> countingAndPrinting(InputStream inputStream, boolean toCountLines, boolean toCountWords,
                                           boolean toCountChars, boolean toCountBytes) throws IOException {
@@ -83,6 +100,14 @@ public class ProcessingTheInputFromFD implements ProcessingAsAService {
                 .toList();
     }
 
+    /**
+     * Executes counting tasks in parallel using parallel streams, based on the options provided.
+     * This method is a placeholder for future implementation that will leverage parallel processing to enhance performance.
+     *
+     * @param options A list of options specifying which counts to calculate (e.g., lines, words, characters, bytes).
+     * @param inputStream The input stream to be processed.
+     * @return A list of long values representing the counts for each requested metric, or an empty list in case of an error.
+     */
     @Override
     public List<Long> execTheTasksWithCountingInParallelWithParallelStreams(List<String> options, InputStream inputStream) {
         Map<String, Boolean> taskOptions = initializeTaskOptions(options);
@@ -95,6 +120,13 @@ public class ProcessingTheInputFromFD implements ProcessingAsAService {
         }
     }
 
+    /**
+     * Initializes task options based on the provided list of options.
+     * This method maps each option (for example, "lines", "words", "chars", "bytes") to a boolean value indicating whether the task should be executed.
+     *
+     * @param options A list of options specifying which counts to calculate.
+     * @return A map of task options to boolean values.
+     */
     private Map<String, Boolean> initializeTaskOptions(List<String> options) {
         Map<String, Boolean> taskOptions = new HashMap<>();
 
@@ -106,12 +138,28 @@ public class ProcessingTheInputFromFD implements ProcessingAsAService {
         return taskOptions;
     }
 
+    /**
+     * Performs the counting tasks based on the specified options and input stream.
+     * This method delegates to {@link #countingAndPrinting(InputStream, boolean, boolean, boolean, boolean)} to perform the actual counting.
+     *
+     * @param inputStream The input stream to be processed.
+     * @param taskOptions A map of task options to boolean values.
+     * @return A list of long values representing the counts for each requested metric.
+     * @throws IOException If an I/O error occurs during processing.
+     */
     private List<Long> performCountingTasks(InputStream inputStream, Map<String, Boolean> taskOptions) throws IOException {
         return countingAndPrinting(inputStream, taskOptions.get("lines"), taskOptions.get("words"),
                 taskOptions.get("chars"), taskOptions.get("bytes")
         );
     }
 
+    /**
+     * Handles IOExceptions by logging the error message and throwing a runtime exception.
+     * This method formats the error message using the {@link OutputFormat} service and prints it to the console.
+     *
+     * @param e The IOException encountered during processing.
+     * @param methodName The name of the method where the exception occurred.
+     */
     private void handleIOException(IOException e, String methodName) {
         ErrorMessage msg = ErrorMessage.builder()
                 .threadName(Thread.currentThread().getName())
