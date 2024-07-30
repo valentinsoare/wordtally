@@ -323,7 +323,8 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
         return CompletableFuture.allOf(allCFs.toArray(e -> new CompletableFuture[]{}))
                 .thenApply(v -> allCFs.stream()
                         .map(CompletableFuture::join)
-                        .toList()).join();
+                        .toList())
+                .join();
     }
 
     /**
