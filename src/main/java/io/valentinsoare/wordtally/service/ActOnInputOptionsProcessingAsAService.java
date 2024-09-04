@@ -195,15 +195,15 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
         boolean toPrintLocation = false;
 
         for (long value : results) {
-            toPrintLocation = false;
+//            toPrintLocation = false;
 
             if (value >= 0) {
                 System.out.printf("%-9s", value);
-                toPrintLocation = true;
+//                toPrintLocation = true;
             }
         }
 
-        if (toPrintLocation) {
+        if (fileToPrint != null) {
             System.out.printf("%s%n", fileToPrint);
         } else {
             System.out.println();

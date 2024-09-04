@@ -129,11 +129,20 @@ public class ProcessingTheInputFromFD implements ProcessingAsAService {
      */
     private Map<String, Boolean> initializeTaskOptions(List<String> options) {
         Map<String, Boolean> taskOptions = new HashMap<>();
+        List<String> availableOptions = new ArrayList<>(Arrays.asList("lines", "words", "bytes", "chars"));
 
-        taskOptions.put("lines", options.contains("lines"));
-        taskOptions.put("words", options.contains("words"));
-        taskOptions.put("chars", options.contains("chars"));
-        taskOptions.put("bytes", options.contains("bytes"));
+        for (String option : availableOptions) {
+            taskOptions.put(option, options.contains(option));
+        }
+
+        if (Collections.frequency(taskOptions.values(), false) == 4) {
+            taskOptions = new HashMap<>(Map.ofEntries(
+                    Map.entry("lines", true),
+                    Map.entry("words", true),
+                    Map.entry("bytes", true),
+                    Map.entry("chars", false)
+            ));
+        }
 
         return taskOptions;
     }
@@ -148,6 +157,8 @@ public class ProcessingTheInputFromFD implements ProcessingAsAService {
      * @throws IOException If an I/O error occurs during processing.
      */
     private List<Long> performCountingTasks(InputStream inputStream, Map<String, Boolean> taskOptions) throws IOException {
+
+
         return countingAndPrinting(inputStream, taskOptions.get("lines"), taskOptions.get("words"),
                 taskOptions.get("chars"), taskOptions.get("bytes")
         );
