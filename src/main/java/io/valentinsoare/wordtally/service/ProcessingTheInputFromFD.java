@@ -72,7 +72,6 @@ public class ProcessingTheInputFromFD implements ProcessingAsAService {
         inputStream.reset();
 
         while ((byteRead = reader.read()) != -1) {
-
             if ((toCountLines) && (byteRead == '\n')) {
                 numberOfLines += 1;
             }
@@ -157,8 +156,6 @@ public class ProcessingTheInputFromFD implements ProcessingAsAService {
      * @throws IOException If an I/O error occurs during processing.
      */
     private List<Long> performCountingTasks(InputStream inputStream, Map<String, Boolean> taskOptions) throws IOException {
-
-
         return countingAndPrinting(inputStream, taskOptions.get("lines"), taskOptions.get("words"),
                 taskOptions.get("chars"), taskOptions.get("bytes")
         );
