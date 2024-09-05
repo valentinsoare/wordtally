@@ -32,7 +32,7 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
     /**
      * Constructor for ActOnInputOptionsProcessingAsAService.
      * It initializes the service with dependencies for output formatting, parsing, and processing.
-     * Also, it prepares the command line options that will be available for the user.
+     * Also, it prepares the command line options that will   be available for the user.
      *
      * @param outputFormat The service for formatting output.
      * @param parsingAsAService The service for parsing input.
