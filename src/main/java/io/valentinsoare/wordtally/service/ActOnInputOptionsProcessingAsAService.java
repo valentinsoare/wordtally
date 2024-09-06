@@ -175,7 +175,7 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
             } else if (Files.notExists(Path.of(f))) {
                 System.err.printf("wordtally: %s: No such file or directory.%n", f);
             } else if (!new File(f).canRead()) {
-                System.err.printf("wordtally: %s: Permission denied.s%n", f);
+                System.err.printf("wordtally: %s: Permission denied.%n", f);
             } else {
                 availableFiles.add(f);
             }
