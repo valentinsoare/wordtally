@@ -179,7 +179,7 @@ public class ProcessingTheInputFromFD implements ProcessingAsAService {
                 .build();
 
         try {
-            System.out.printf("%s %n", outputFormat.withJSONStyle().writeValueAsString(msg));
+            System.err.printf("%s %n", outputFormat.withJSONStyle().writeValueAsString(msg));
         } catch (JsonProcessingException ex) {
             throw new RuntimeException(ex);
         }

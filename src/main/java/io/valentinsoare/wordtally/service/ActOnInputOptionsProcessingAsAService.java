@@ -171,11 +171,11 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
 
         locations.parallelStream().forEach(f -> {
             if (new File(f).isDirectory()) {
-                System.out.printf("wordtally: %s: Is a directory%n", f);
+                System.err.printf("wordtally: %s: Is a directory.%n", f);
             } else if (Files.notExists(Path.of(f))) {
-                System.out.printf("wordtally: %s: No such file or directory%n", f);
+                System.err.printf("wordtally: %s: No such file or directory.%n", f);
             } else if (!new File(f).canRead()) {
-                System.out.printf("wordtally: %s: No read permissions%n", f);
+                System.err.printf("wordtally: %s: Permission denied.s%n", f);
             } else {
                 availableFiles.add(f);
             }
@@ -195,11 +195,9 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
         boolean toPrintLocation = false;
 
         for (long value : results) {
-//            toPrintLocation = false;
 
             if (value >= 0) {
                 System.out.printf("%-9s", value);
-//                toPrintLocation = true;
             }
         }
 
@@ -336,7 +334,7 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
     private void catchCheckTheReaderException(InputStream inputStream) {
         try {
             if (!parsingAsAService.checkTheReaderIsReady(inputStream)) {
-                System.out.printf("wordtally: no input provided%nTry 'wordtally -h|--help' for more information.%n");
+                System.err.printf("wordtally: no input provided%nTry 'wordtally -h|--help' for more information.%n");
                 System.exit(0);
             }
         } catch (IOException e) {
@@ -350,7 +348,7 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
                     .build();
 
             try {
-                System.out.printf("%s %n", outputFormat.withJSONStyle().writeValueAsString(msg));
+                System.err.printf("%s %n", outputFormat.withJSONStyle().writeValueAsString(msg));
             } catch (JsonProcessingException ex) {
                 throw new RuntimeException(ex);
             }

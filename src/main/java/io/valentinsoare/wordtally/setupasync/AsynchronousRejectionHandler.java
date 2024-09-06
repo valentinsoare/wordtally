@@ -51,7 +51,7 @@ public class AsynchronousRejectionHandler implements RejectedExecutionHandler {
                 .build();
 
         try {
-            System.out.printf("%s %n", outputFormat.withJSONStyle().writeValueAsString(msg));
+            System.err.printf("%s %n", outputFormat.withJSONStyle().writeValueAsString(msg));
         } catch (JsonProcessingException e) {
             System.out.printf("%s %n", e.getMessage());
         }
