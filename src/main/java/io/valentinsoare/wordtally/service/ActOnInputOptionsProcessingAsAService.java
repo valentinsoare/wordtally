@@ -148,7 +148,7 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
 
             for (String s : v.split("")) {
                 if (!requiredOptions.hasOption(s)) {
-                    System.out.printf("wordtally: invalid option -- '%s'%nTry 'wordtally -h|--help' for more information.%n", s);
+                    System.err.printf("wordtally: invalid option -- '%s'%nTry 'wordtally -h|--help' for more information.%n", s);
                 }
             }
 

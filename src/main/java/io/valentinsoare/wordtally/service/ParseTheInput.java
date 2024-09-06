@@ -104,7 +104,7 @@ public class ParseTheInput implements ParsingAsAService {
                     .build();
 
             try {
-                System.out.printf("%s %n", outputFormat.withJSONStyle().writeValueAsString(msg));
+                System.err.printf("%s %n", outputFormat.withJSONStyle().writeValueAsString(msg));
             } catch (JsonProcessingException ex) {
                 throw new RuntimeException(ex);
             }
@@ -144,7 +144,7 @@ public class ParseTheInput implements ParsingAsAService {
                     .dateTime(Instant.now().toString())
                     .build();
             try {
-                System.out.printf("%s %n", outputFormat.withJSONStyle().writeValueAsString(msg));
+                System.err.printf("%s %n", outputFormat.withJSONStyle().writeValueAsString(msg));
             } catch (JsonProcessingException ex) {
                 throw new RuntimeException(ex);
             }
@@ -188,7 +188,7 @@ public class ParseTheInput implements ParsingAsAService {
                     .build();
 
             try {
-                System.out.printf("%s %n", outputFormat.withJSONStyle().writeValueAsString(msg));
+                System.err.printf("%s %n", outputFormat.withJSONStyle().writeValueAsString(msg));
             } catch (JsonProcessingException ex) {
                 throw new RuntimeException(ex);
             }
@@ -219,7 +219,7 @@ public class ParseTheInput implements ParsingAsAService {
                     .message(e.getMessage())
                     .build();
 
-            System.out.printf("%s%n", outputFormat.withJSONStyle().writeValueAsString(msg));
+            System.err.printf("%s%n", outputFormat.withJSONStyle().writeValueAsString(msg));
             return false;
         }
     }
