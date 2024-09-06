@@ -62,12 +62,12 @@ public class ParseTheInput implements ParsingAsAService {
                     .build();
 
             try {
-                System.out.printf("%s %n", outputFormat.withJSONStyle().writeValueAsString(msg));
+                System.err.printf("%s %n", outputFormat.withJSONStyle().writeValueAsString(msg));
             } catch (JsonProcessingException ex) {
                 throw new RuntimeException(ex);
             }
         } catch (CompletionException | UncheckedIOException f) {
-            System.out.printf("wordtally: %s: Cannot count number of lines for this format.%n", inputFile);
+            System.err.printf("wordtally: %s: Cannot count number of lines for this format.%n", inputFile);
         }
 
         return CompletableFuture.completedFuture(-1L);
