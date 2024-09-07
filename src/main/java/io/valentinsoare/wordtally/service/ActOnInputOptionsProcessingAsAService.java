@@ -97,7 +97,7 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
         HelpFormatter helpFormatter = new HelpFormatter();
 
         try (PrintWriter printWriter = new PrintWriter(System.out)) {
-            printWriter.printf("%nWordTally v0.0.1%n");
+            printWriter.printf("%nWordTally v0.0.3%n");
 
             printWriter.printf("%n%s%n%s%n%s%n%n",
                     "Application counts the number of lines, words, characters, and bytes\nfrom one or more text files or from keyboard and prints the results to standard output.",
