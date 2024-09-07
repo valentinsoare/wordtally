@@ -83,12 +83,11 @@ public class ParseTheInput implements ParsingAsAService {
     @Async
     @Override
     public CompletableFuture<Long> countTheNumberOfChars(Path inputFile) {
-        int bR = 0;
         long numberOfChars = 0;
 
         try (BufferedReader reader =
                      new BufferedReader(new InputStreamReader(Files.newInputStream(inputFile), StandardCharsets.UTF_8))) {
-            while ((bR = reader.read()) != -1) {
+            while (reader.read() != -1) {
                 numberOfChars += 1;
             }
 

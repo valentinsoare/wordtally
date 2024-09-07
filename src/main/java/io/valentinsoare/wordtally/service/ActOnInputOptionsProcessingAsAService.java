@@ -192,10 +192,7 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
      * @param fileToPrint The name of the file these results correspond to.
      */
     private void constructOutputToPrint(List<Long> results, String fileToPrint) {
-        boolean toPrintLocation = false;
-
         for (long value : results) {
-
             if (value >= 0) {
                 System.out.printf("%-9s", value);
             }
