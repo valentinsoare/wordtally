@@ -9,9 +9,14 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.nio.Buffer;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.time.Instant;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -67,7 +72,28 @@ public class ParseTheInput implements ParsingAsAService {
                 throw new RuntimeException(ex);
             }
         } catch (CompletionException | UncheckedIOException f) {
-            System.err.printf("wordtally: %s: Cannot count number of lines for this format.%n", inputFile);
+            ByteBuffer buffer = ByteBuffer.allocateDirect(2048 * 2048);
+
+            int count = 0;
+            final int newLine = 0xA;
+
+            try (FileChannel channel = FileChannel.open(inputFile, StandardOpenOption.READ)) {
+                while (channel.read(buffer) != -1) {
+                    buffer.flip();
+
+                    for (int i = 0; i < buffer.limit(); i++) {
+                        if (buffer.get(i) == newLine) {
+                            count++;
+                        }
+                    }
+
+                    buffer.clear();
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            return CompletableFuture.completedFuture((long) count);
         }
 
         return CompletableFuture.completedFuture(-1L);
@@ -86,7 +112,7 @@ public class ParseTheInput implements ParsingAsAService {
         long numberOfChars = 0;
 
         try (BufferedReader reader =
-                     new BufferedReader(new InputStreamReader(Files.newInputStream(inputFile), StandardCharsets.UTF_8))) {
+                     new BufferedReader(new InputStreamReader(Files.newInputStream(inputFile)))) {
             while (reader.read() != -1) {
                 numberOfChars += 1;
             }

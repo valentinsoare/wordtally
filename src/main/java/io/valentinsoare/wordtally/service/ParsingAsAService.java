@@ -3,6 +3,7 @@ package io.valentinsoare.wordtally.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
 

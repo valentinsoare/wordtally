@@ -6,6 +6,7 @@ import io.valentinsoare.wordtally.exception.Severity;
 import io.valentinsoare.wordtally.outputformat.OutputFormat;
 import org.apache.commons.cli.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -213,7 +214,15 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
      * @param nCol The number of columns to print, determined by the number of options specified by the user.
      */
     private void calculateTotalIfMultipleFilesAndPrint(List<List<Long>> givenValuesFromCounter, int nCol) {
-        List<Long> calcTotal = new ArrayList<>(givenValuesFromCounter.get(0));
+        List<Long> v = Collections.emptyList();
+
+        try {
+            v = givenValuesFromCounter.get(0);
+        } catch (IndexOutOfBoundsException e) {
+            System.exit(1);
+        }
+
+        List<Long> calcTotal = new ArrayList<>(v);
 
         for (int j = 1; j < givenValuesFromCounter.size(); j++) {
             for (int i = 0; i < nCol; i++)
@@ -241,6 +250,7 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
      * @param arguments The command line arguments.
      * @param inputStream The standard input stream, used if no files are specified.
      */
+
     @Override
     public void runTasksFromInput(String[] arguments, InputStream inputStream) {
         Map<String, List<String>> tasksAndFiles = extractTypeOfTasksAndLocationsFromInput(arguments);
@@ -290,7 +300,7 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
      * Executes the specified tasks (e.g., counting lines, words, characters, bytes) on a given file.
      * It processes the file according to the options provided and returns the counts as a list of long values.
      *
-     * @param options A list of options specifying which counts to calculate.
+     * @param options   A list of options specifying which counts to calculate.
      * @param inputFile The path to the file to be processed.
      * @return A list of long values representing the counts for each requested metric.
      */
@@ -318,8 +328,7 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
         return CompletableFuture.allOf(allCFs.toArray(e -> new CompletableFuture[]{}))
                 .thenApply(v -> allCFs.stream()
                         .map(CompletableFuture::join)
-                        .toList())
-                .join();
+                        .toList()).join();
     }
 
     /**

@@ -32,10 +32,10 @@ public class DynamicThreadPoolManager implements TaskExecutor {
      * for tasks that cannot be executed immediately.
      */
     private DynamicThreadPoolManager() {
-        this.corePoolSize = 2;
-        this.maxPoolSize = 6;
-        this.keepAliveTime = 35;
-        this.arrayQueueSize = 500;
+        this.corePoolSize = 6;
+        this.maxPoolSize = 9;
+        this.keepAliveTime = 1;
+        this.arrayQueueSize = 20000;
         this.nameOfTheWorkingThread = "working-thread";
 
         ThreadFactory threadFactoryExecTasks = (r -> {
