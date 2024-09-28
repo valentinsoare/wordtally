@@ -22,8 +22,21 @@ public class DynamicThreadPoolManager implements TaskExecutor {
     private int keepAliveTime;
     private int arrayQueueSize;
 
+    private static int MAX_CONCURRENT_TASKS;
+    private static Semaphore semaphore;
+    private static int FREE_THREADS;
+
     private String nameOfTheWorkingThread;
     private ThreadPoolExecutor threadPoolExecutor;
+
+    /*
+     * We need some free processors/threads in order for the OS to work properly while the software will run.
+     */
+    static {
+        FREE_THREADS = 3;
+        MAX_CONCURRENT_TASKS = Runtime.getRuntime().availableProcessors() - FREE_THREADS;
+        semaphore = new Semaphore(MAX_CONCURRENT_TASKS);
+    }
 
     /**
      * Private constructor to prevent direct instantiation.
@@ -32,10 +45,10 @@ public class DynamicThreadPoolManager implements TaskExecutor {
      * for tasks that cannot be executed immediately.
      */
     private DynamicThreadPoolManager() {
-        this.corePoolSize = 6;
-        this.maxPoolSize = 9;
-        this.keepAliveTime = 1;
-        this.arrayQueueSize = 20000;
+        this.corePoolSize = MAX_CONCURRENT_TASKS;
+        this.maxPoolSize = MAX_CONCURRENT_TASKS;
+        this.keepAliveTime = 35;
+        this.arrayQueueSize = 500;
         this.nameOfTheWorkingThread = "working-thread";
 
         ThreadFactory threadFactoryExecTasks = (r -> {
@@ -63,6 +76,22 @@ public class DynamicThreadPoolManager implements TaskExecutor {
      */
     public static DynamicThreadPoolManager generateNewDynamicThreadPoolManager() {
         return new DynamicThreadPoolManager();
+    }
+
+    /**
+     *
+     * @return Existing semaphore instance initiated at the beginning of this class
+     * with MAX_CONCURRENT_TASKS as an input.
+     */
+    public static Semaphore getSemaphore() {
+        return semaphore;
+    }
+
+    /**
+     * @return Number of max concurrent tasks which is the size of the thread pool.
+     */
+    public static int getMaxConcurrentTasks() {
+        return  MAX_CONCURRENT_TASKS;
     }
 
     /**

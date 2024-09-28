@@ -9,7 +9,7 @@ import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
 
-/**
+/***
  * Custom exception handler for handling uncaught exceptions in asynchronous operations.
  * Implements {@link AsyncUncaughtExceptionHandler} to provide a mechanism for dealing with exceptions
  * that occur during the execution of asynchronous methods.

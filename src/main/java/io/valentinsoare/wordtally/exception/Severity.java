@@ -1,6 +1,6 @@
 package io.valentinsoare.wordtally.exception;
 
-/***
+/**
  * Error Message severities defined and used when objects are created from ErrorMessage class.
  */
 

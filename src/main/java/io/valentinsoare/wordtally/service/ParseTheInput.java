@@ -5,20 +5,15 @@ import io.valentinsoare.wordtally.exception.ErrorMessage;
 import io.valentinsoare.wordtally.exception.Severity;
 import io.valentinsoare.wordtally.outputformat.OutputFormat;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.time.Instant;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
@@ -31,7 +26,6 @@ import java.util.stream.Stream;
  */
 @Service
 public class ParseTheInput implements ParsingAsAService {
-
     private final OutputFormat outputFormat;
 
     /**
@@ -51,11 +45,10 @@ public class ParseTheInput implements ParsingAsAService {
      * @param inputFile The path to the file whose lines are to be counted.
      * @return A CompletableFuture that, upon completion, returns the count of lines in the file.
      */
-    @Async
     @Override
-    public CompletableFuture<Long> countTheNumberOfLines(Path inputFile) {
+    public Long countTheNumberOfLines(Path inputFile) {
         try (Stream<String> execCounting = Files.lines(inputFile).parallel()) {
-           return CompletableFuture.completedFuture(execCounting.count());
+           return execCounting.count();
         } catch (IOException e) {
             ErrorMessage msg = ErrorMessage.builder()
                     .severity(Severity.ERROR)
@@ -72,6 +65,10 @@ public class ParseTheInput implements ParsingAsAService {
                 throw new RuntimeException(ex);
             }
         } catch (CompletionException | UncheckedIOException f) {
+            /*
+             *   This buffer occupies space on the actual storage device, and it's set to 4096 kilobytes
+             *   in order to help us to read input from pipeline, like from another command.
+             */
             ByteBuffer buffer = ByteBuffer.allocateDirect(2048 * 2048);
 
             int count = 0;
@@ -93,10 +90,10 @@ public class ParseTheInput implements ParsingAsAService {
                 throw new RuntimeException(e);
             }
 
-            return CompletableFuture.completedFuture((long) count);
+            return (long) count;
         }
 
-        return CompletableFuture.completedFuture(-1L);
+        return -1L;
     }
 
     /**
@@ -106,18 +103,16 @@ public class ParseTheInput implements ParsingAsAService {
      * @param inputFile The path to the file whose characters are to be counted.
      * @return A CompletableFuture that, upon completion, returns the count of characters in the file.
      */
-    @Async
     @Override
-    public CompletableFuture<Long> countTheNumberOfChars(Path inputFile) {
+    public Long countTheNumberOfChars(Path inputFile) {
         long numberOfChars = 0;
 
-        try (BufferedReader reader =
-                     new BufferedReader(new InputStreamReader(Files.newInputStream(inputFile)))) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(Files.newInputStream(inputFile)))) {
             while (reader.read() != -1) {
                 numberOfChars += 1;
             }
 
-            return CompletableFuture.completedFuture(numberOfChars);
+            return numberOfChars;
         } catch (IOException e) {
             ErrorMessage msg = ErrorMessage.builder()
                     .severity(Severity.ERROR)
@@ -135,7 +130,7 @@ public class ParseTheInput implements ParsingAsAService {
             }
         }
 
-        return CompletableFuture.completedFuture(-1L);
+        return -1L;
     }
 
     /**
@@ -145,9 +140,8 @@ public class ParseTheInput implements ParsingAsAService {
      * @param inputFile The path to the file whose words are to be counted.
      * @return A CompletableFuture that, upon completion, returns the count of words in the file.
      */
-    @Async
     @Override
-    public CompletableFuture<Long> countTheNumberOfWords(Path inputFile) {
+    public Long countTheNumberOfWords(Path inputFile) {
         try (Stream<String> s = Files.lines(inputFile).parallel()) {
             AtomicLong wordCount = new AtomicLong();
 
@@ -158,7 +152,7 @@ public class ParseTheInput implements ParsingAsAService {
                         }
                     });
 
-            return CompletableFuture.completedFuture(wordCount.get());
+            return wordCount.get();
         } catch (IOException e) {
             ErrorMessage msg = ErrorMessage.builder()
                     .clazzName(this.getClass().getName())
@@ -177,7 +171,7 @@ public class ParseTheInput implements ParsingAsAService {
             System.out.printf("wordtally: %s: Cannot count number of words for this format.%n", inputFile);
         }
 
-        return CompletableFuture.completedFuture(-1L);
+        return -1L;
     }
 
     /**
@@ -187,10 +181,8 @@ public class ParseTheInput implements ParsingAsAService {
      * @param inputFile The path to the file whose bytes are to be counted.
      * @return A CompletableFuture that, upon completion, returns the count of bytes in the file.
      */
-    @Async
     @Override
-    public CompletableFuture<Long> countTheNumberOfBytes(Path inputFile) {
-
+    public Long countTheNumberOfBytes(Path inputFile) {
         try (InputStream inputStream = Files.newInputStream(inputFile)) {
             long bytesCount = 0;
 
@@ -201,7 +193,7 @@ public class ParseTheInput implements ParsingAsAService {
                 bytesCount += byteRead;
             }
 
-            return CompletableFuture.completedFuture(bytesCount);
+            return bytesCount;
         } catch (IOException e) {
             ErrorMessage msg = ErrorMessage.builder()
                     .threadName(Thread.currentThread().getName())
@@ -219,7 +211,7 @@ public class ParseTheInput implements ParsingAsAService {
             }
         }
 
-        return CompletableFuture.completedFuture(-1L);
+        return -1L;
     }
 
     /**

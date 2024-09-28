@@ -8,7 +8,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
-/**
+/***
  * Defines the contract for processing input options and arguments.
  * This interface outlines methods for extracting tasks and file locations from command line arguments,
  * running tasks based on the input, printing help information, checking file availability and permissions,

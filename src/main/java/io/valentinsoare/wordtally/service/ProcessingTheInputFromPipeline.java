@@ -24,7 +24,7 @@ import java.util.stream.Stream;
  * */
 
 @Service
-public class ProcessingTheInputFromFD implements ProcessingAsAService {
+public class ProcessingTheInputFromPipeline implements ProcessingAsAService {
 
     private final OutputFormat outputFormat;
 
@@ -34,7 +34,7 @@ public class ProcessingTheInputFromFD implements ProcessingAsAService {
      * @param outputFormat The service for formatting output.
      */
     @Autowired
-    public ProcessingTheInputFromFD(OutputFormat outputFormat) {
+    public ProcessingTheInputFromPipeline(OutputFormat outputFormat) {
         this.outputFormat = outputFormat;
     }
 

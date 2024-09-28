@@ -4,9 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.valentinsoare.wordtally.exception.ErrorMessage;
 import io.valentinsoare.wordtally.exception.Severity;
 import io.valentinsoare.wordtally.outputformat.OutputFormat;
+import io.valentinsoare.wordtally.setupasync.DynamicThreadPoolManager;
 import org.apache.commons.cli.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -14,7 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 /***
@@ -255,17 +255,32 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
     public void runTasksFromInput(String[] arguments, InputStream inputStream) {
         Map<String, List<String>> tasksAndFiles = extractTypeOfTasksAndLocationsFromInput(arguments);
         List<String> options = tasksAndFiles.get("options"), locations = tasksAndFiles.get("locations");
+
+        Semaphore semaphore = DynamicThreadPoolManager.getSemaphore();
         Map<String, CompletableFuture<List<Long>>> results = new HashMap<>();
 
         if (!locations.isEmpty()) {
             List<String> filesToBeProcess = checkFilesAvailabilityAndPermissions(locations);
 
             for (String f : filesToBeProcess) {
-                Path file = Path.of(f);
+                if (f != null) {
+                    Path file = Path.of(f);
 
-                CompletableFuture<List<Long>> cfT =
-                        CompletableFuture.supplyAsync(() -> executeTasks(options, file));
-                results.put(file.toString(), cfT);
+                    CompletableFuture<List<Long>> cfT = CompletableFuture.supplyAsync(() -> {
+                        try {
+                            semaphore.acquire();
+                            return executeTasks(options, file);
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                        } finally {
+                            semaphore.release();
+                        }
+
+                        return Collections.emptyList();
+                    });
+
+                    results.put(file.toString(), cfT);
+                }
             }
 
             Map<String, List<Long>> rs = CompletableFuture.allOf(results.values().toArray(e -> new CompletableFuture[]{}))
@@ -277,10 +292,7 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
             }
 
             if (locations.size() > 1) {
-                calculateTotalIfMultipleFilesAndPrint(
-                        new ArrayList<>(rs.values()),
-                        options.isEmpty() ? 3 : options.size()
-                );
+                calculateTotalIfMultipleFilesAndPrint(new ArrayList<>(rs.values()),options.isEmpty() ? 3 : options.size());
             }
         } else {
             options.forEach(e -> {
@@ -306,7 +318,7 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
      */
     @Override
     public List<Long> executeTasks(List<String> options, Path inputFile) {
-        List<CompletableFuture<Long>> allCFs = new ArrayList<>();
+        List<Long> allCFs = new ArrayList<>();
 
         if (options.isEmpty()) {
             allCFs.addAll(Arrays.asList(
@@ -316,19 +328,16 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
         } else {
             for (String s : options) {
                 switch (s) {
-                    case "help" -> printHelp(requiredOptions);
                     case "lines" -> allCFs.add(parsingAsAService.countTheNumberOfLines(inputFile));
                     case "words" -> allCFs.add(parsingAsAService.countTheNumberOfWords(inputFile));
                     case "chars" -> allCFs.add(parsingAsAService.countTheNumberOfChars(inputFile));
                     case "bytes" -> allCFs.add(parsingAsAService.countTheNumberOfBytes(inputFile));
+                    default -> printHelp(requiredOptions);
                 }
             }
         }
 
-        return CompletableFuture.allOf(allCFs.toArray(e -> new CompletableFuture[]{}))
-                .thenApply(v -> allCFs.stream()
-                        .map(CompletableFuture::join)
-                        .toList()).join();
+        return allCFs;
     }
 
     /**

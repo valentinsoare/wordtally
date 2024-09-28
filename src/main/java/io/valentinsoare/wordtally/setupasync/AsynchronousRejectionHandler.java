@@ -10,7 +10,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 
-/**
+/***
  * Handles the rejection of tasks submitted to the asynchronous execution pool.
  * This class implements {@link RejectedExecutionHandler} to provide custom logic for handling task rejections,
  * such as logging or notifying stakeholders when a task cannot be accepted by the thread pool.
