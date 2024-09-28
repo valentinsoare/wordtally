@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 /***
  * Defines the contract for processing input options and arguments.

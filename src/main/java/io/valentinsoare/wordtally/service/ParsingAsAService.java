@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.util.concurrent.CompletableFuture;
 
 /***
  * The ParsingAsAService interface defines the contract for parsing services capable of asynchronously counting various elements (lines, characters, words, bytes) in input files.
@@ -11,9 +12,9 @@ import java.nio.file.Path;
  * This interface is designed to be implemented by services that perform parsing operations in an asynchronous manner, leveraging CompletableFuture for non-blocking I/O operations.
  */
 public interface ParsingAsAService {
-   Long countTheNumberOfLines(Path inputFile);
-   Long countTheNumberOfChars(Path inputFile);
+   CompletableFuture<Long> countTheNumberOfLines(Path inputFile);
+   CompletableFuture<Long> countTheNumberOfChars(Path inputFile);
    boolean checkTheReaderIsReady(InputStream inputStream) throws JsonProcessingException;
-   Long countTheNumberOfWords(Path inputFile);
-   Long countTheNumberOfBytes(Path inputFile);
+   CompletableFuture<Long> countTheNumberOfWords(Path inputFile);
+   CompletableFuture<Long> countTheNumberOfBytes(Path inputFile);
 }

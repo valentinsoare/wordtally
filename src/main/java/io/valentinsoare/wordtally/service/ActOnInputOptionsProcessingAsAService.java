@@ -318,13 +318,15 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
      */
     @Override
     public List<Long> executeTasks(List<String> options, Path inputFile) {
-        List<Long> allCFs = new ArrayList<>();
+        List<CompletableFuture<Long>> allCFs = new ArrayList<>();
 
         if (options.isEmpty()) {
             allCFs.addAll(Arrays.asList(
-                    parsingAsAService.countTheNumberOfLines(inputFile),
-                    parsingAsAService.countTheNumberOfWords(inputFile),
-                    parsingAsAService.countTheNumberOfBytes(inputFile)));
+                        parsingAsAService.countTheNumberOfLines(inputFile),
+                        parsingAsAService.countTheNumberOfWords(inputFile),
+                        parsingAsAService.countTheNumberOfBytes(inputFile)
+                    )
+            );
         } else {
             for (String s : options) {
                 switch (s) {
@@ -337,7 +339,10 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
             }
         }
 
-        return allCFs;
+        return CompletableFuture.allOf(allCFs.toArray(e -> new CompletableFuture[]{}))
+                .thenApply(v -> allCFs.stream()
+                        .map(CompletableFuture::join)
+                        .toList()).join();
     }
 
     /**
