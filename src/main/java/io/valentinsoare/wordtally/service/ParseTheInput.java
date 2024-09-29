@@ -12,6 +12,7 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.time.Instant;
@@ -75,7 +76,7 @@ public class ParseTheInput implements ParsingAsAService {
              */
             ByteBuffer buffer = ByteBuffer.allocateDirect(2048 * 2048);
 
-            AtomicInteger count = new AtomicInteger(0);
+            int count = 0;
             final int newLine = 0xA;
 
             try (FileChannel channel = FileChannel.open(inputFile, StandardOpenOption.READ)) {
@@ -84,7 +85,7 @@ public class ParseTheInput implements ParsingAsAService {
 
                     for (int i = 0; i < buffer.limit(); i++) {
                         if (buffer.get(i) == newLine) {
-                            count.getAndIncrement();
+                            count++;
                         }
                     }
 
@@ -94,7 +95,7 @@ public class ParseTheInput implements ParsingAsAService {
                 throw new RuntimeException(e);
             }
 
-            return CompletableFuture.completedFuture((long) count.get());
+            return CompletableFuture.completedFuture((long) count);
         }
 
         return CompletableFuture.completedFuture(-1L);
@@ -110,14 +111,14 @@ public class ParseTheInput implements ParsingAsAService {
     @Async
     @Override
     public CompletableFuture<Long> countTheNumberOfChars(Path inputFile) {
-        AtomicLong numberOfChars = new AtomicLong(0);
+        Long numberOfChars = 0L;
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(Files.newInputStream(inputFile)))) {
             while (reader.read() != -1) {
-                numberOfChars.getAndIncrement();
+                numberOfChars++;
             }
 
-            return CompletableFuture.completedFuture(numberOfChars.get());
+            return CompletableFuture.completedFuture(numberOfChars);
         } catch (IOException e) {
             ErrorMessage msg = ErrorMessage.builder()
                     .severity(Severity.ERROR)
@@ -191,16 +192,16 @@ public class ParseTheInput implements ParsingAsAService {
     @Override
     public CompletableFuture<Long> countTheNumberOfBytes(Path inputFile) {
         try (InputStream inputStream = Files.newInputStream(inputFile)) {
-            AtomicLong bytesCount = new AtomicLong(0);
+           Long bytesCount = 0L;
 
             int byteRead;
             byte[] bytes = new byte[2048];
 
             while ((byteRead = inputStream.read(bytes)) != -1) {
-                bytesCount.getAndAdd(byteRead);
+                bytesCount += byteRead;
             }
 
-            return CompletableFuture.completedFuture(bytesCount.get());
+            return CompletableFuture.completedFuture(bytesCount);
         } catch (IOException e) {
             ErrorMessage msg = ErrorMessage.builder()
                     .threadName(Thread.currentThread().getName())

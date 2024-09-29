@@ -168,8 +168,15 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
      */
     @Override
     public List<String> checkFilesAvailabilityAndPermissions(List<String> locations) {
-        List<String> availableFiles = new ArrayList<>();
+        /*
+         * Here we need a sync/thread safe list
+         * in order to have available all the files processed in parallel on multiple threads.
+         */
+        List<String> availableFiles = Collections.synchronizedList(new ArrayList<>());
 
+        /*
+         * Here we process the destinations/locations in parallel on multiple streams with multithreading.
+         */
         locations.parallelStream().forEach(f -> {
             if (new File(f).isDirectory()) {
                 System.err.printf("wordtally: %s: Is a directory.%n", f);
