@@ -257,7 +257,7 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
         List<String> options = tasksAndFiles.get("options"), locations = tasksAndFiles.get("locations");
 
         Semaphore semaphore = DynamicThreadPoolManager.getSemaphore();
-        Map<String, CompletableFuture<List<Long>>> results = new HashMap<>();
+        ConcurrentHashMap<String, CompletableFuture<List<Long>>> results = new ConcurrentHashMap<>();
 
         if (!locations.isEmpty()) {
             List<String> filesToBeProcess = checkFilesAvailabilityAndPermissions(locations);
@@ -284,7 +284,7 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
             }
 
             Map<String, List<Long>> rs = CompletableFuture.allOf(results.values().toArray(e -> new CompletableFuture[]{}))
-                    .thenApplyAsync(w -> results.entrySet().stream()
+                    .thenApply(w -> results.entrySet().stream()
                             .collect(Collectors.toMap(Map.Entry::getKey, v -> v.getValue().join()))).join();
 
             for (Map.Entry<String, List<Long>> e : rs.entrySet()) {
@@ -318,7 +318,7 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
      */
     @Override
     public List<Long> executeTasks(List<String> options, Path inputFile) {
-        List<CompletableFuture<Long>> allCFs = new ArrayList<>();
+        List<CompletableFuture<Long>> allCFs = Collections.synchronizedList(new ArrayList<>());
 
         if (options.isEmpty()) {
             allCFs.addAll(Arrays.asList(
