@@ -12,13 +12,11 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
-import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.time.Instant;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 
@@ -67,8 +65,11 @@ public class ParseTheInput implements ParsingAsAService {
             try {
                 System.err.printf("%s %n", outputFormat.withJSONStyle().writeValueAsString(msg));
             } catch (JsonProcessingException ex) {
-                throw new RuntimeException(ex);
+                System.out.printf("%n\033[1;31m%s - class: %s, method: %s, %s\0330m%n",
+                        Severity.ERROR, this.getClass().getName(), "countTheNumberOfLines", ex.getMessage());
             }
+
+            System.exit(0);
         } catch (CompletionException | UncheckedIOException f) {
             /*
              *   This buffer occupies space on the actual storage device, and it's set to 4096 kilobytes
@@ -92,7 +93,9 @@ public class ParseTheInput implements ParsingAsAService {
                     buffer.clear();
                 }
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                System.out.printf("%n\033[1;31m%s - class: %s, method: %s, %s\0330m%n",
+                        Severity.ERROR, this.getClass().getName(), "countTheNumberOfLines", e.getMessage());
+                System.exit(0);
             }
 
             return CompletableFuture.completedFuture((long) count);
@@ -132,8 +135,11 @@ public class ParseTheInput implements ParsingAsAService {
             try {
                 System.err.printf("%s %n", outputFormat.withJSONStyle().writeValueAsString(msg));
             } catch (JsonProcessingException ex) {
-                throw new RuntimeException(ex);
+                System.out.printf("%n\033[1;31m%s - class: %s, method: %s, %s\0330m%n",
+                        Severity.ERROR, this.getClass().getName(), "countTheNumberOfChars", ex.getMessage());
             }
+
+            System.exit(0);
         }
 
         return CompletableFuture.completedFuture(-1L);
@@ -172,10 +178,41 @@ public class ParseTheInput implements ParsingAsAService {
             try {
                 System.err.printf("%s %n", outputFormat.withJSONStyle().writeValueAsString(msg));
             } catch (JsonProcessingException ex) {
-                throw new RuntimeException(ex);
+                System.out.printf("%n\033[1;31m%s - class: %s, method: %s, %s\0330m%n",
+                        Severity.ERROR, this.getClass().getName(), "countTheNumberOfWords", ex.getMessage());
+                System.exit(0);
             }
-        } catch (CompletionException | UncheckedIOException f) {
-            System.out.printf("wordtally: %s: Cannot count number of words for this format.%n", inputFile);
+        } catch (CompletionException | UncheckedIOException | UnsupportedOperationException f) {
+            Long wordCount = 0L;
+            ByteBuffer buffer = ByteBuffer.allocateDirect(2048 * 2048);
+            boolean inWord = false;
+
+            try (FileChannel channel = FileChannel.open(inputFile, StandardOpenOption.READ)) {
+                while (channel.read(buffer) != -1) {
+                    buffer.flip();
+
+                    for (int i = 0; i < buffer.limit(); i++) {
+                        byte b = buffer.get(i);
+
+                        if ((b >= 0x21 && b <= 0x7E)) {
+                            if (!inWord) {
+                                wordCount++;
+                                inWord = true;
+                            }
+                        } else if (b == 0x9 || b == 0xA || b == 0xB || b == 0xC || b == 0xD || b == 0x20) {
+                            inWord = false;
+                        }
+                    }
+
+                    buffer.clear();
+                }
+            } catch (IOException | CompletionException e) {
+                System.out.printf("%n\033[1;31m%s - class: %s, method: %s, %s\0330m%n",
+                        Severity.ERROR, this.getClass().getName(), "countTheNumberOfWords", e.getMessage());
+                System.exit(0);
+            }
+
+            return CompletableFuture.completedFuture(wordCount);
         }
 
         return CompletableFuture.completedFuture(-1L);
@@ -215,7 +252,9 @@ public class ParseTheInput implements ParsingAsAService {
             try {
                 System.err.printf("%s %n", outputFormat.withJSONStyle().writeValueAsString(msg));
             } catch (JsonProcessingException ex) {
-                throw new RuntimeException(ex);
+                System.out.printf("%n\033[1;31m%s - class: %s, method: %s, %s\0330m%n",
+                        Severity.ERROR, this.getClass().getName(), "countTheNumberOfBytes", ex.getMessage());
+                System.exit(0);
             }
         }
 

@@ -261,10 +261,11 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
     @Override
     public void runTasksFromInput(String[] arguments, InputStream inputStream) {
         Map<String, List<String>> tasksAndFiles = extractTypeOfTasksAndLocationsFromInput(arguments);
+
         List<String> options = tasksAndFiles.get("options"), locations = tasksAndFiles.get("locations");
 
         Semaphore semaphore = DynamicThreadPoolManager.getSemaphore();
-        ConcurrentHashMap<String, CompletableFuture<List<Long>>> results = new ConcurrentHashMap<>();
+        Map<String, CompletableFuture<List<Long>>> results = new ConcurrentHashMap<>();
 
         if (!locations.isEmpty()) {
             List<String> filesToBeProcess = checkFilesAvailabilityAndPermissions(locations);
@@ -362,7 +363,6 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
         try {
             if (!parsingAsAService.checkTheReaderIsReady(inputStream)) {
                 System.err.printf("wordtally: no input provided%nTry 'wordtally -h|--help' for more information.%n");
-                System.exit(0);
             }
         } catch (IOException e) {
             ErrorMessage msg = ErrorMessage.builder()
@@ -377,10 +377,11 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
             try {
                 System.err.printf("%s %n", outputFormat.withJSONStyle().writeValueAsString(msg));
             } catch (JsonProcessingException ex) {
-                throw new RuntimeException(ex);
+                System.out.printf("%n\033[1;31m%s - class: %s, method: %s, %s\0330m%n",
+                        Severity.ERROR, this.getClass().getName(), "catchCheckTheReaderException", ex.getMessage());
             }
-
-            System.exit(0);
         }
+
+        System.exit(0);
     }
 }
