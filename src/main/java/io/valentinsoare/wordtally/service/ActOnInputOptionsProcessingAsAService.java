@@ -271,24 +271,22 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
             List<String> filesToBeProcess = checkFilesAvailabilityAndPermissions(locations);
 
             for (String f : filesToBeProcess) {
-                if (f != null) {
-                    Path file = Path.of(f);
+                Path file = Path.of(f);
 
-                    CompletableFuture<List<Long>> cfT = CompletableFuture.supplyAsync(() -> {
-                        try {
-                            semaphore.acquire();
-                            return executeTasks(options, file);
-                        } catch (InterruptedException e) {
-                            Thread.currentThread().interrupt();
-                        } finally {
-                            semaphore.release();
-                        }
+                CompletableFuture<List<Long>> cfT = CompletableFuture.supplyAsync(() -> {
+                    try {
+                        semaphore.acquire();
+                        return executeTasks(options, file);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    } finally {
+                        semaphore.release();
+                    }
 
-                        return Collections.emptyList();
-                    });
+                    return Collections.emptyList();
+                });
 
-                    results.put(file.toString(), cfT);
-                }
+                results.put(file.toString(), cfT);
             }
 
             Map<String, List<Long>> rs = CompletableFuture.allOf(results.values().toArray(e -> new CompletableFuture[]{}))

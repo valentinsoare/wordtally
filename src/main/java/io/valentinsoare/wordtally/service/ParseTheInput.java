@@ -114,7 +114,7 @@ public class ParseTheInput implements ParsingAsAService {
     @Async
     @Override
     public CompletableFuture<Long> countTheNumberOfChars(Path inputFile) {
-        Long numberOfChars = 0L;
+        long numberOfChars = 0L;
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(Files.newInputStream(inputFile)))) {
             while (reader.read() != -1) {
@@ -146,7 +146,7 @@ public class ParseTheInput implements ParsingAsAService {
     }
 
     /**
-     * Asynchronously counts the number of words in a given file.
+     * Asynchronously counts the number of words in a given file, text/binary file.
      * Splits the file content by whitespace to identify words, using parallel streams for efficiency.
      *
      * @param inputFile The path to the file whose words are to be counted.
@@ -183,7 +183,13 @@ public class ParseTheInput implements ParsingAsAService {
                 System.exit(0);
             }
         } catch (CompletionException | UncheckedIOException | UnsupportedOperationException f) {
-            Long wordCount = 0L;
+
+            /*
+             * This approach bellow is for counting number of words in a binary file. But please take notice that it's possible
+             * counting not to be exact. We don't know the encoding for this, we just analyze the raw bytes and see if we have:
+             * white spaces and printable characters.
+             */
+            long wordCount = 0L;
             ByteBuffer buffer = ByteBuffer.allocateDirect(2048 * 2048);
             boolean inWord = false;
 
@@ -229,7 +235,7 @@ public class ParseTheInput implements ParsingAsAService {
     @Override
     public CompletableFuture<Long> countTheNumberOfBytes(Path inputFile) {
         try (InputStream inputStream = Files.newInputStream(inputFile)) {
-           Long bytesCount = 0L;
+           long bytesCount = 0L;
 
             int byteRead;
             byte[] bytes = new byte[2048];
