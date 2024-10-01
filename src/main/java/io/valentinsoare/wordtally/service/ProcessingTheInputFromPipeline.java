@@ -181,8 +181,8 @@ public class ProcessingTheInputFromPipeline implements ProcessingAsAService {
         try {
             System.err.printf("%s %n", outputFormat.withJSONStyle().writeValueAsString(msg));
         } catch (JsonProcessingException ex) {
-            System.out.printf("%n\033[1;31m%s - class: %s, method: %s, %s\0330m%n",
-                    Severity.ERROR, this.getClass().getName(), "handleIOException", ex.getMessage());
+            System.err.printf("%n\033[1;31m%s - class: %s, method: %s, %s\0330m%n",
+                    Severity.FATAL, this.getClass().getName(), "handleIOException", ex.getMessage());
             System.exit(0);
         }
     }

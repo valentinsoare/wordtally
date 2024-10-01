@@ -200,14 +200,16 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
      * @param fileToPrint The name of the file these results correspond to.
      */
     private void constructOutputToPrint(List<Long> results, String fileToPrint) {
+        System.out.printf("%s", " ".repeat(5));
+
         for (long value : results) {
             if (value >= 0) {
-                System.out.printf("%-9s", value);
+                System.out.printf("%-13s", value);
             }
         }
 
         if (fileToPrint != null) {
-            System.out.printf("%s%n", fileToPrint);
+            System.out.printf("%-10s%n", fileToPrint);
         } else {
             System.out.println();
         }
@@ -238,15 +240,17 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
 
         boolean toPrintTotalTag = false;
 
+        System.out.printf("%s", " ".repeat(5));
+
         for (long value : calcTotal) {
             if (value >= 0) {
                 toPrintTotalTag = true;
-                System.out.printf("%-9s", value);
+                System.out.printf("%-13s", value);
             }
         }
 
         if (toPrintTotalTag) {
-            System.out.printf("%-9s%n", "total");
+            System.out.printf("%-10s%n", "total");
         }
     }
 
@@ -261,9 +265,7 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
     @Override
     public void runTasksFromInput(String[] arguments, InputStream inputStream) {
         Map<String, List<String>> tasksAndFiles = extractTypeOfTasksAndLocationsFromInput(arguments);
-
         List<String> options = tasksAndFiles.get("options"), locations = tasksAndFiles.get("locations");
-
         Semaphore semaphore = DynamicThreadPoolManager.getSemaphore();
         Map<String, CompletableFuture<List<Long>>> results = new ConcurrentHashMap<>();
 
@@ -361,6 +363,7 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
         try {
             if (!parsingAsAService.checkTheReaderIsReady(inputStream)) {
                 System.err.printf("wordtally: no input provided%nTry 'wordtally -h|--help' for more information.%n");
+                System.exit(0);
             }
         } catch (IOException e) {
             ErrorMessage msg = ErrorMessage.builder()
@@ -375,11 +378,10 @@ public class ActOnInputOptionsProcessingAsAService implements InputOptionsAsArgu
             try {
                 System.err.printf("%s %n", outputFormat.withJSONStyle().writeValueAsString(msg));
             } catch (JsonProcessingException ex) {
-                System.out.printf("%n\033[1;31m%s - class: %s, method: %s, %s\0330m%n",
-                        Severity.ERROR, this.getClass().getName(), "catchCheckTheReaderException", ex.getMessage());
+                System.err.printf("%n\033[1;31m%s - class: %s, method: %s, %s\0330m%n",
+                        Severity.FATAL, this.getClass().getName(), "catchCheckTheReaderException", ex.getMessage());
+                System.exit(0);
             }
         }
-
-        System.exit(0);
     }
 }

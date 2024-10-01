@@ -50,7 +50,7 @@ public class AsynchronousExceptionHandler implements AsyncUncaughtExceptionHandl
         try {
             System.err.printf("%s %n", outputFormat.withJSONStyle().writeValueAsString(msg));
         } catch (JsonProcessingException e) {
-            System.out.printf("%s %n", e.getMessage());
+            System.err.printf("%s %n", e.getMessage());
         }
     }
 }

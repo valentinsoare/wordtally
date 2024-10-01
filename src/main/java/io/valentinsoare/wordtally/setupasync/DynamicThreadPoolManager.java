@@ -24,17 +24,16 @@ public class DynamicThreadPoolManager implements TaskExecutor {
 
     private static int MAX_CONCURRENT_TASKS;
     private static Semaphore semaphore;
-    private static int FREE_THREADS;
+    private static int FREE_PROC;
+    private static int AVAILABLE_PROC;
 
     private String nameOfTheWorkingThread;
     private ThreadPoolExecutor threadPoolExecutor;
 
-    /*
-     * We need some free processors/threads in order for the OS to work properly while the software will run.
-     */
     static {
-        FREE_THREADS = 3;
-        MAX_CONCURRENT_TASKS = Runtime.getRuntime().availableProcessors() - FREE_THREADS;
+        AVAILABLE_PROC = Runtime.getRuntime().availableProcessors();
+        FREE_PROC = (AVAILABLE_PROC <= 3) ? 1 : 2;
+        MAX_CONCURRENT_TASKS = Runtime.getRuntime().availableProcessors() - FREE_PROC;
         semaphore = new Semaphore(MAX_CONCURRENT_TASKS);
     }
 

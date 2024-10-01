@@ -50,7 +50,7 @@ public class ParseTheInput implements ParsingAsAService {
     @Async
     @Override
     public CompletableFuture<Long> countTheNumberOfLines(Path inputFile) {
-        try (Stream<String> execCounting = Files.lines(inputFile).parallel()) {
+        try (Stream<String> execCounting = Files.lines(inputFile)) {
            return CompletableFuture.completedFuture(execCounting.count());
         } catch (IOException e) {
             ErrorMessage msg = ErrorMessage.builder()
@@ -65,17 +65,17 @@ public class ParseTheInput implements ParsingAsAService {
             try {
                 System.err.printf("%s %n", outputFormat.withJSONStyle().writeValueAsString(msg));
             } catch (JsonProcessingException ex) {
-                System.out.printf("%n\033[1;31m%s - class: %s, method: %s, %s\0330m%n",
-                        Severity.ERROR, this.getClass().getName(), "countTheNumberOfLines", ex.getMessage());
+                System.err.printf("%n\033[1;31m%s - class: %s, method: %s, %s\0330m%n",
+                        Severity.FATAL, this.getClass().getName(), "countTheNumberOfLines", ex.getMessage());
             }
 
             System.exit(0);
         } catch (CompletionException | UncheckedIOException f) {
             /*
-             *   This buffer occupies space on the actual storage device, and it's set to 4096 kilobytes
+             *   This buffer occupies space on the actual storage device, and it's set to 1048576 bytes
              *   in order to help us to read input from pipeline, like from another command.
              */
-            ByteBuffer buffer = ByteBuffer.allocateDirect(2048 * 2048);
+            ByteBuffer buffer = ByteBuffer.allocateDirect(1048576);
 
             int count = 0;
             final int newLine = 0xA;
@@ -93,8 +93,8 @@ public class ParseTheInput implements ParsingAsAService {
                     buffer.clear();
                 }
             } catch (IOException e) {
-                System.out.printf("%n\033[1;31m%s - class: %s, method: %s, %s\0330m%n",
-                        Severity.ERROR, this.getClass().getName(), "countTheNumberOfLines", e.getMessage());
+                System.err.printf("%n\033[1;31m%s - class: %s, method: %s, %s\0330m%n",
+                        Severity.FATAL, this.getClass().getName(), "countTheNumberOfLines", e.getMessage());
                 System.exit(0);
             }
 
@@ -115,14 +115,26 @@ public class ParseTheInput implements ParsingAsAService {
     @Override
     public CompletableFuture<Long> countTheNumberOfChars(Path inputFile) {
         long numberOfChars = 0L;
+        ByteBuffer buffer = ByteBuffer.allocateDirect(1048576);
 
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(Files.newInputStream(inputFile)))) {
-            while (reader.read() != -1) {
-                numberOfChars++;
+        try (FileChannel channel = FileChannel.open(inputFile, StandardOpenOption.READ)) {
+            while (channel.read(buffer) != -1) {
+                buffer.flip();
+
+                for (int i = 0; i < buffer.limit(); i++) {
+                    byte b = buffer.get(i);
+
+                    if ((b >= 0x9 && b <= 0x7E) || ((b & 0xFF) >= 0x80)) {
+                        numberOfChars++;
+                    }
+                }
+
+                buffer.clear();
             }
 
             return CompletableFuture.completedFuture(numberOfChars);
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             ErrorMessage msg = ErrorMessage.builder()
                     .severity(Severity.ERROR)
                     .methodName("countTheNumberOfChars")
@@ -135,14 +147,12 @@ public class ParseTheInput implements ParsingAsAService {
             try {
                 System.err.printf("%s %n", outputFormat.withJSONStyle().writeValueAsString(msg));
             } catch (JsonProcessingException ex) {
-                System.out.printf("%n\033[1;31m%s - class: %s, method: %s, %s\0330m%n",
-                        Severity.ERROR, this.getClass().getName(), "countTheNumberOfChars", ex.getMessage());
+                System.err.printf("%n\033[1;31m%s - class: %s, method: %s, %s\0330m%n",
+                        Severity.FATAL, this.getClass().getName(), "countTheNumberOfChars", ex.getMessage());
             }
 
-            System.exit(0);
+            return CompletableFuture.completedFuture(-1L);
         }
-
-        return CompletableFuture.completedFuture(-1L);
     }
 
     /**
@@ -178,8 +188,8 @@ public class ParseTheInput implements ParsingAsAService {
             try {
                 System.err.printf("%s %n", outputFormat.withJSONStyle().writeValueAsString(msg));
             } catch (JsonProcessingException ex) {
-                System.out.printf("%n\033[1;31m%s - class: %s, method: %s, %s\0330m%n",
-                        Severity.ERROR, this.getClass().getName(), "countTheNumberOfWords", ex.getMessage());
+                System.err.printf("%n\033[1;31m%s - class: %s, method: %s, %s\0330m%n",
+                        Severity.FATAL, this.getClass().getName(), "countTheNumberOfWords", ex.getMessage());
                 System.exit(0);
             }
         } catch (CompletionException | UncheckedIOException | UnsupportedOperationException f) {
@@ -190,7 +200,7 @@ public class ParseTheInput implements ParsingAsAService {
              * white spaces and printable characters.
              */
             long wordCount = 0L;
-            ByteBuffer buffer = ByteBuffer.allocateDirect(2048 * 2048);
+            ByteBuffer buffer = ByteBuffer.allocateDirect(1048576);
             boolean inWord = false;
 
             try (FileChannel channel = FileChannel.open(inputFile, StandardOpenOption.READ)) {
@@ -213,8 +223,8 @@ public class ParseTheInput implements ParsingAsAService {
                     buffer.clear();
                 }
             } catch (IOException | CompletionException e) {
-                System.out.printf("%n\033[1;31m%s - class: %s, method: %s, %s\0330m%n",
-                        Severity.ERROR, this.getClass().getName(), "countTheNumberOfWords", e.getMessage());
+                System.err.printf("%n\033[1;31m%s - class: %s, method: %s, %s\0330m%n",
+                        Severity.FATAL, this.getClass().getName(), "countTheNumberOfWords", e.getMessage());
                 System.exit(0);
             }
 
@@ -258,8 +268,8 @@ public class ParseTheInput implements ParsingAsAService {
             try {
                 System.err.printf("%s %n", outputFormat.withJSONStyle().writeValueAsString(msg));
             } catch (JsonProcessingException ex) {
-                System.out.printf("%n\033[1;31m%s - class: %s, method: %s, %s\0330m%n",
-                        Severity.ERROR, this.getClass().getName(), "countTheNumberOfBytes", ex.getMessage());
+                System.err.printf("%n\033[1;31m%s - class: %s, method: %s, %s\0330m%n",
+                        Severity.FATAL, this.getClass().getName(), "countTheNumberOfBytes", ex.getMessage());
                 System.exit(0);
             }
         }
