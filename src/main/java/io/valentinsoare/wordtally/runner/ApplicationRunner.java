@@ -44,5 +44,4 @@ public class ApplicationRunner implements CommandLineRunner {
         actOnInputOptionsAsArguments.runTasksFromInput(args, inputStream);
         System.exit(0);
     }
-
 }

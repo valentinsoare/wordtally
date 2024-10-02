@@ -1,6 +1,7 @@
 package io.valentinsoare.wordtally.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import io.valentinsoare.wordtally.auxiliary.Utils;
 import io.valentinsoare.wordtally.exception.ErrorMessage;
 import io.valentinsoare.wordtally.exception.Severity;
 import io.valentinsoare.wordtally.outputformat.OutputFormat;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -18,6 +20,8 @@ import java.time.Instant;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.regex.MatchResult;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 /***
@@ -105,6 +109,29 @@ public class ParseTheInput implements ParsingAsAService {
     }
 
     /**
+     * Logs an error message when an exception occurs during the counting of characters.
+     *
+     * @param message The error message to be logged.
+     */
+    public void printExceptionForCountingChars(String message) {
+        ErrorMessage msg = ErrorMessage.builder()
+                .severity(Severity.ERROR)
+                .methodName("countTheNumberOfChars")
+                .message(message)
+                .threadName(Thread.currentThread().getName())
+                .dateTime(Instant.now().toString())
+                .clazzName(this.getClass().getName())
+                .build();
+
+        try {
+            System.err.printf("%s %n", outputFormat.withJSONStyle().writeValueAsString(msg));
+        } catch (JsonProcessingException ex) {
+            System.err.printf("%n\033[1;31m%s - class: %s, method: %s, %s\0330m%n",
+                    Severity.FATAL, this.getClass().getName(), "countTheNumberOfChars", ex.getMessage());
+        }
+    }
+
+    /**
      * Asynchronously counts the number of characters in a given file.
      * Reads the file character by character to ensure accurate counting.
      *
@@ -114,7 +141,23 @@ public class ParseTheInput implements ParsingAsAService {
     @Async
     @Override
     public CompletableFuture<Long> countTheNumberOfChars(Path inputFile) {
-        long numberOfChars = 0L;
+        long numberOfChars = 0;
+
+        if (!Utils.isBinaryFile(inputFile)) {
+            try (BufferedReader reader =
+                         new BufferedReader(new InputStreamReader(Files.newInputStream(inputFile), StandardCharsets.UTF_8))) {
+                while (reader.read() != -1) {
+                    numberOfChars += 1;
+                }
+
+                return CompletableFuture.completedFuture(numberOfChars);
+            } catch (IOException e) {
+                printExceptionForCountingChars(e.getMessage());
+            }
+
+            return CompletableFuture.completedFuture(-1L);
+        }
+
         ByteBuffer buffer = ByteBuffer.allocateDirect(1048576);
 
         try (FileChannel channel = FileChannel.open(inputFile, StandardOpenOption.READ)) {
@@ -133,26 +176,11 @@ public class ParseTheInput implements ParsingAsAService {
             }
 
             return CompletableFuture.completedFuture(numberOfChars);
+        } catch (IOException e) {
+            printExceptionForCountingChars(e.getMessage());
         }
-        catch (IOException e) {
-            ErrorMessage msg = ErrorMessage.builder()
-                    .severity(Severity.ERROR)
-                    .methodName("countTheNumberOfChars")
-                    .message(e.getMessage())
-                    .threadName(Thread.currentThread().getName())
-                    .dateTime(Instant.now().toString())
-                    .clazzName(this.getClass().getName())
-                    .build();
 
-            try {
-                System.err.printf("%s %n", outputFormat.withJSONStyle().writeValueAsString(msg));
-            } catch (JsonProcessingException ex) {
-                System.err.printf("%n\033[1;31m%s - class: %s, method: %s, %s\0330m%n",
-                        Severity.FATAL, this.getClass().getName(), "countTheNumberOfChars", ex.getMessage());
-            }
-
-            return CompletableFuture.completedFuture(-1L);
-        }
+        return CompletableFuture.completedFuture(-1L);
     }
 
     /**
@@ -165,17 +193,12 @@ public class ParseTheInput implements ParsingAsAService {
     @Async
     @Override
     public CompletableFuture<Long> countTheNumberOfWords(Path inputFile) {
-        try (Stream<String> s = Files.lines(inputFile).parallel()) {
-            AtomicLong wordCount = new AtomicLong();
+        try (Stream<String> s = Files.lines(inputFile)) {
+            long wordCount = s.flatMap(line -> Stream.of(line.split("\\s")))
+                    .filter(word -> !"".equals(word))
+                    .count();
 
-            s.flatMap(line -> Stream.of(line.split("\\s")))
-                    .forEach(e -> {
-                        if (!"".equals(e)) {
-                            wordCount.getAndIncrement();
-                        }
-                    });
-
-            return CompletableFuture.completedFuture(wordCount.get());
+            return CompletableFuture.completedFuture(wordCount);
         } catch (IOException e) {
             ErrorMessage msg = ErrorMessage.builder()
                     .clazzName(this.getClass().getName())
@@ -248,7 +271,7 @@ public class ParseTheInput implements ParsingAsAService {
            long bytesCount = 0L;
 
             int byteRead;
-            byte[] bytes = new byte[2048];
+            byte[] bytes = new byte[1048576];
 
             while ((byteRead = inputStream.read(bytes)) != -1) {
                 bytesCount += byteRead;
