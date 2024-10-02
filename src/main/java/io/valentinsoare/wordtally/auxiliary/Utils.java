@@ -5,6 +5,7 @@ import io.valentinsoare.wordtally.exception.ErrorMessage;
 import io.valentinsoare.wordtally.exception.Severity;
 import io.valentinsoare.wordtally.outputformat.OutputFormat;
 
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -32,11 +33,9 @@ public class Utils {
      */
     public static boolean isBinaryFile(Path path) {
         try (FileChannel fileChannel = FileChannel.open(path, StandardOpenOption.READ)) {
-            int numberOfTries = 0;
+            ByteBuffer buffer = ByteBuffer.allocate(5120);
 
-            ByteBuffer buffer = ByteBuffer.allocate(1024);
-
-            while (fileChannel.read(buffer) > 0 && numberOfTries < 3) {
+            if (fileChannel.read(buffer) > 0) {
                 buffer.flip();
 
                 for (int i = 0; i < buffer.limit(); i++) {
@@ -47,8 +46,8 @@ public class Utils {
                     }
                 }
 
-                numberOfTries++;
                 buffer.clear();
+                return false;
             }
 
             return false;
