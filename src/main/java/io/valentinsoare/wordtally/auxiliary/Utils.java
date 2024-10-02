@@ -5,7 +5,6 @@ import io.valentinsoare.wordtally.exception.ErrorMessage;
 import io.valentinsoare.wordtally.exception.Severity;
 import io.valentinsoare.wordtally.outputformat.OutputFormat;
 
-
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
